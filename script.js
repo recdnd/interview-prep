@@ -173,7 +173,7 @@ function render() {
       '<div class="row">' +
         '<span class="title">' + escapeHtml(emoji + ' ' + q.title) + '</span>' +
         '<span class="nav">' +
-          '<button type="button" class="pin' + (isPinned ? ' pinned' : '') + '" data-q="' + qIndex + '" aria-label="置頂"><img src="pin32.png" alt=""></button>' +
+          '<button type="button" class="pin' + (isPinned ? ' pinned' : '') + '" data-q="' + qIndex + '" aria-label="置頂"><img src="pin-mini.png" alt=""></button>' +
           '<button type="button" class="prev" data-q="' + qIndex + '" aria-label="上一模板">◀</button>' +
           '<button type="button" class="next" data-q="' + qIndex + '" aria-label="下一模板">▶</button>' +
         '</span>' +
