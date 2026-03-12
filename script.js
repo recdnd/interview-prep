@@ -1,9 +1,10 @@
 // pack loader + viewer
 
 (function () {
-  const PACK_ORDER = ["jp-interview", "en-interview", "en-work"];
+  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work"];
   const PACK_LABEL = {
     "jp-interview": "JI",
+    "cs-core": "CS",
     "en-interview": "EI",
     "en-work": "EW"
   };
