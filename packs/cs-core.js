@@ -10,7 +10,7 @@ window.PACK = {
 I built a system called Spiral that explores how event histories can be represented structurally instead of relying on mutable state.
 
 The main challenge was designing an execution model that remained simple while still being practical to use.`,
-          audio: "recordings/Spiral system design-1.m4a"
+          audio: "recordings/cs-core/q1/a1.m4a"
         },
         {
           text: `20s
@@ -19,7 +19,7 @@ One project I've been working on is called Spiral.
 It explores how software systems can represent event histories using an append-only structure instead of traditional mutable state.
 
 The main challenge was designing an execution model that kept the system understandable while still being practical to implement.`,
-          audio: "recordings/Spiral system design-2.m4a"
+          audio: "recordings/cs-core/q1/a2.m4a"
         },
         {
           text: `40s
@@ -32,7 +32,7 @@ Instead of mutating state directly, Spiral records events in an append-only stru
 Early on the architecture became too complex, so I simplified the model and focused on the core execution rules.
 
 Later I built a prototype platform so people could interact with the system.`,
-          audio: "recordings/Spiral system design-3.m4a"
+          audio: "recordings/cs-core/q1/a3.m4a"
         },
         {
           text: `90s
@@ -51,7 +51,7 @@ Eventually I simplified the design and focused on the core execution model.
 After that I built a prototype platform where users could interact with the system through a structured editor.
 
 What I enjoyed most was connecting system architecture with a usable interface.`,
-          audio: "recordings/Spiral system design-4.m4a"
+          audio: "recordings/cs-core/q1/a4.m4a"
         }
       ]
     },
@@ -64,14 +64,14 @@ What I enjoyed most was connecting system architecture with a usable interface.`
 During a robotics competition a wheel came off during a match.
 
 Our team quickly divided tasks and replaced it so we could continue.`,
-          audio: "recordings/Robotics teamwork story-1.m4a"
+          audio: "recordings/cs-core/q2/a1.m4a"
         },
         {
           text: `20s
 During a robotics competition I worked on a small team responsible for maintaining the robot.
 
 In one match a wheel came off, so we had to react quickly and divide tasks to repair it.`,
-          audio: "recordings/Robotics teamwork story-2.m4a"
+          audio: "recordings/cs-core/q2/a2.m4a"
         },
         {
           text: `40s
@@ -84,7 +84,7 @@ We reacted quickly and divided tasks immediately.
 One teammate stabilized the robot while another teammate and I replaced the wheel assembly.
 
 It showed me how important communication and coordination are in a team.`,
-          audio: "recordings/Robotics teamwork story-3.m4a"
+          audio: "recordings/cs-core/q2/a3.m4a"
         },
         {
           text: `90s
@@ -99,7 +99,7 @@ We immediately divided responsibilities. One teammate stabilized the robot while
 Even though it was stressful the team stayed calm and focused on solving the problem step by step.
 
 That experience taught me how important communication and coordination are when unexpected problems happen in a team environment.`,
-          audio: "recordings/Robotics teamwork story-4.m4a"
+          audio: "recordings/cs-core/q2/a4.m4a"
         }
       ]
     },
@@ -110,14 +110,14 @@ That experience taught me how important communication and coordination are when 
         {
           text: `10s
 I enjoy working on problems where system architecture and user experience intersect.`,
-          audio: "recordings/Product oriented engineering mindset-1.m4a"
+          audio: "recordings/cs-core/q3/a1.m4a"
         },
         {
           text: `20s
 I'm particularly interested in building systems where architecture and product usability come together.
 
 I like thinking about both how the system works internally and how people interact with it.`,
-          audio: "recordings/Product oriented engineering mindset-2.m4a"
+          audio: "recordings/cs-core/q3/a2.m4a"
         },
         {
           text: `40s
@@ -126,7 +126,7 @@ I tend to approach engineering problems from both a system design and product pe
 When designing systems I think not only about the internal architecture but also how users will understand and interact with it.
 
 This perspective influenced projects like Spiral, where I tried to turn an abstract system idea into something people could actually use.`,
-          audio: "recordings/Product oriented engineering mindset-3.m4a"
+          audio: "recordings/cs-core/q3/a3.m4a"
         },
         {
           text: `90s
@@ -139,7 +139,7 @@ When building the Spiral prototype I wasn't only focused on the execution model 
 I also designed an interface that would make the system understandable for users who didn't know the internal implementation.
 
 That combination of system design and product thinking is something I find very interesting and it's the kind of work I hope to continue doing as an engineer.`,
-          audio: "recordings/Product oriented engineering mindset-4.m4a"
+          audio: "recordings/cs-core/q3/a4.m4a"
         }
       ]
     }
