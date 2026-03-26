@@ -99,7 +99,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
 
   function getVariantRole(q, tplIndex) {
     const v = q && q.variants[tplIndex];
-    if (v && typeof v === 'object' && v.role) return String(v.role);
+    if (typeof v === 'object' && v && v.role) return v.role;
     return null;
   }
 
@@ -172,13 +172,9 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       section.className = 'section';
       section.dataset.qIndex = String(qIndex);
       const isPinned = state.pinOrder.indexOf(qIndex) >= 0;
-      const variantRole = getVariantRole(q, tplIndex);
-      const titleLine =
-        escapeHtml(mark + ' ' + q.title) +
-        (variantRole ? ' <span class="variant-role">' + escapeHtml(variantRole) + '</span>' : '');
       section.innerHTML =
         '<div class="row">' +
-          '<span class="title">' + titleLine + '</span>' +
+          '<span class="title">' + escapeHtml(mark + ' ' + q.title) + '</span>' +
           '<span class="nav">' +
             '<button type="button" class="pin' + (isPinned ? ' pinned' : '') + '" data-q="' + qIndex + '" aria-label="置頂"><img src="pin-mini.png" alt=""></button>' +
             '<button type="button" class="prev" data-q="' + qIndex + '" aria-label="上一模板">◀</button>' +
