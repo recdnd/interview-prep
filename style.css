@@ -5,6 +5,7 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
 .section { margin-bottom: 1.25rem; }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; }
 .title { flex: 1; outline: none; }
+.variant-role { font-size: 0.72rem; color: #666; font-weight: normal; }
 .nav { flex-shrink: 0; }
 .nav button { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0.2rem 0.4rem; }
 .nav button:disabled { opacity: 0.4; cursor: default; }

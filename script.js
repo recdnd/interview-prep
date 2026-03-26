@@ -97,6 +97,12 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     return (v && typeof v === 'object' && v.audio) ? v.audio : null;
   }
 
+  function getVariantRole(q, tplIndex) {
+    const v = q && q.variants[tplIndex];
+    if (v && typeof v === 'object' && v.role) return String(v.role);
+    return null;
+  }
+
   function setTplIndex(qIndex, i) {
     const q = QUESTIONS[qIndex];
     const max = q ? q.variants.length - 1 : 0;
@@ -166,9 +172,13 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       section.className = 'section';
       section.dataset.qIndex = String(qIndex);
       const isPinned = state.pinOrder.indexOf(qIndex) >= 0;
+      const variantRole = getVariantRole(q, tplIndex);
+      const titleLine =
+        escapeHtml(mark + ' ' + q.title) +
+        (variantRole ? ' <span class="variant-role">' + escapeHtml(variantRole) + '</span>' : '');
       section.innerHTML =
         '<div class="row">' +
-          '<span class="title">' + escapeHtml(mark + ' ' + q.title) + '</span>' +
+          '<span class="title">' + titleLine + '</span>' +
           '<span class="nav">' +
             '<button type="button" class="pin' + (isPinned ? ' pinned' : '') + '" data-q="' + qIndex + '" aria-label="置頂"><img src="pin-mini.png" alt=""></button>' +
             '<button type="button" class="prev" data-q="' + qIndex + '" aria-label="上一模板">◀</button>' +
