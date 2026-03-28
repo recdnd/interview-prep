@@ -131,25 +131,295 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     return div.innerHTML;
   }
 
-  function renderAudioButton(src, sectionEl) {
-    const btn = document.createElement('div');
+  // —— global audio controller (single element, no per-button Audio instances) ——
+  const audioEl = document.createElement('audio');
+  audioEl.setAttribute('playsinline', '');
+  audioEl.preload = 'auto';
+  audioEl.style.display = 'none';
+  document.body.appendChild(audioEl);
+
+  /** @type {{ mode: 'none'|'single'|'pack', singleQIndex: number|null, lastPlayback: { qIndex: number, tplIndex: number, src: string }|null }} */
+  const ac = {
+    mode: 'none',
+    singleQIndex: null,
+    lastPlayback: null
+  };
+
+  let packLoopBtnEl = null;
+
+  function buildPackQueue() {
+    const order = buildRenderOrder();
+    const queue = [];
+    for (let k = 0; k < order.length; k++) {
+      const qIndex = order[k];
+      const q = QUESTIONS[qIndex];
+      if (!q) continue;
+      const tplIndex = getTplIndex(qIndex);
+      const src = getVariantAudio(q, tplIndex);
+      if (src) {
+        queue.push({ qIndex: qIndex, tplIndex: tplIndex, src: src });
+      }
+    }
+    return queue;
+  }
+
+  function clearPlaybackDom() {
+    document.querySelectorAll('.section.audio-playing').forEach(function (el) {
+      el.classList.remove('audio-playing');
+    });
+    document.querySelectorAll('.audio-btn.is-playing').forEach(function (el) {
+      el.classList.remove('is-playing');
+    });
+    document.querySelectorAll('.loop-mini-btn.active').forEach(function (el) {
+      el.classList.remove('active');
+    });
+    const packLoopBtn = document.getElementById('pack-loop-btn');
+    if (packLoopBtn) packLoopBtn.classList.remove('active');
+  }
+
+  function syncPlaybackDom() {
+    clearPlaybackDom();
+    if (ac.mode === 'pack' && packLoopBtnEl) {
+      packLoopBtnEl.classList.add('active');
+    }
+    if (ac.mode === 'single' && ac.singleQIndex != null) {
+      const sec = document.querySelector('.section[data-q-index="' + ac.singleQIndex + '"]');
+      if (sec) {
+        const lb = sec.querySelector('.loop-mini-btn.loop-single');
+        if (lb) lb.classList.add('active');
+      }
+    }
+    if (!ac.lastPlayback) return;
+    const lp = ac.lastPlayback;
+    if (audioEl.paused) return;
+    const sec = document.querySelector('.section[data-q-index="' + lp.qIndex + '"]');
+    if (!sec) return;
+    sec.classList.add('audio-playing');
+    const playBtn = sec.querySelector('.audio-btn');
+    if (playBtn) playBtn.classList.add('is-playing');
+  }
+
+  function stopPlayback(resetMode) {
+    audioEl.pause();
+    audioEl.removeAttribute('src');
+    audioEl.load();
+    ac.lastPlayback = null;
+    if (resetMode) {
+      ac.mode = 'none';
+      ac.singleQIndex = null;
+    }
+    clearPlaybackDom();
+  }
+
+  function stopPackLoop() {
+    if (ac.mode !== 'pack') return;
+    stopPlayback(true);
+  }
+
+  function stopSingleLoop() {
+    if (ac.mode !== 'single') return;
+    stopPlayback(true);
+  }
+
+  function stopAllLoopsAndOneShot() {
+    audioEl.pause();
+    audioEl.removeAttribute('src');
+    audioEl.load();
+    ac.mode = 'none';
+    ac.singleQIndex = null;
+    ac.lastPlayback = null;
+    clearPlaybackDom();
+  }
+
+  function onAudioError() {
+    stopAllLoopsAndOneShot();
+    audioEl.removeAttribute('src');
+    audioEl.load();
+  }
+
+  function playSrc(src, qIndex, tplIndex) {
+    if (!src) return;
+    ac.lastPlayback = { qIndex: qIndex, tplIndex: tplIndex, src: src };
+    audioEl.src = src;
+    audioEl.play().catch(function () {
+      onAudioError();
+    });
+  }
+
+  function playOnce(qIndex, tplIndex, src) {
+    stopAllLoopsAndOneShot();
+    playSrc(src, qIndex, tplIndex);
+    syncPlaybackDom();
+  }
+
+  function startSingleLoop(qIndex) {
+    const q = QUESTIONS[qIndex];
+    if (!q) return;
+    const tplIndex = getTplIndex(qIndex);
+    const src = getVariantAudio(q, tplIndex);
+    if (!src) return;
+    stopAllLoopsAndOneShot();
+    ac.mode = 'single';
+    ac.singleQIndex = qIndex;
+    playSrc(src, qIndex, tplIndex);
+    syncPlaybackDom();
+  }
+
+  function toggleSingleLoop(qIndex) {
+    const q = QUESTIONS[qIndex];
+    if (!q) return;
+    const tplIndex = getTplIndex(qIndex);
+    const src = getVariantAudio(q, tplIndex);
+    if (!src) return;
+    if (ac.mode === 'single' && ac.singleQIndex === qIndex) {
+      stopSingleLoop();
+      return;
+    }
+    startSingleLoop(qIndex);
+  }
+
+  function startPackLoop() {
+    const queue = buildPackQueue();
+    if (queue.length === 0) return;
+    stopAllLoopsAndOneShot();
+    ac.mode = 'pack';
+    ac.singleQIndex = null;
+    const first = queue[0];
+    playSrc(first.src, first.qIndex, first.tplIndex);
+    syncPlaybackDom();
+  }
+
+  function togglePackLoop() {
+    if (ac.mode === 'pack') {
+      stopPackLoop();
+      return;
+    }
+    startPackLoop();
+  }
+
+  audioEl.addEventListener('ended', function () {
+    if (ac.mode === 'single' && ac.singleQIndex != null) {
+      const q = QUESTIONS[ac.singleQIndex];
+      if (!q) {
+        stopSingleLoop();
+        return;
+      }
+      const tplIndex = getTplIndex(ac.singleQIndex);
+      const src = getVariantAudio(q, tplIndex);
+      if (!src) {
+        stopSingleLoop();
+        return;
+      }
+      playSrc(src, ac.singleQIndex, tplIndex);
+      syncPlaybackDom();
+      return;
+    }
+    if (ac.mode === 'pack') {
+      const queue = buildPackQueue();
+      if (queue.length === 0) {
+        stopPackLoop();
+        return;
+      }
+      const finished = ac.lastPlayback;
+      let nextIdx = 0;
+      if (finished) {
+        const i = queue.findIndex(function (e) {
+          return e.qIndex === finished.qIndex && e.tplIndex === finished.tplIndex && e.src === finished.src;
+        });
+        if (i >= 0) {
+          nextIdx = (i + 1) % queue.length;
+        }
+      }
+      const next = queue[nextIdx];
+      playSrc(next.src, next.qIndex, next.tplIndex);
+      syncPlaybackDom();
+      return;
+    }
+    ac.lastPlayback = null;
+    ac.mode = 'none';
+    syncPlaybackDom();
+  });
+
+  audioEl.addEventListener('error', function () {
+    onAudioError();
+  });
+
+  audioEl.addEventListener('play', function () {
+    syncPlaybackDom();
+  });
+
+  function syncAudioStateAfterRender() {
+    if (ac.mode === 'single' && ac.singleQIndex != null) {
+      const q = QUESTIONS[ac.singleQIndex];
+      if (!q) {
+        stopSingleLoop();
+        return;
+      }
+      const tplIndex = getTplIndex(ac.singleQIndex);
+      const src = getVariantAudio(q, tplIndex);
+      if (!src) {
+        stopSingleLoop();
+        return;
+      }
+      if (ac.lastPlayback && ac.lastPlayback.src !== src) {
+        playSrc(src, ac.singleQIndex, tplIndex);
+      }
+    }
+    if (ac.mode === 'pack') {
+      const queue = buildPackQueue();
+      if (queue.length === 0) {
+        stopPackLoop();
+        return;
+      }
+      if (ac.lastPlayback) {
+        const i = queue.findIndex(function (e) {
+          return e.qIndex === ac.lastPlayback.qIndex &&
+            e.tplIndex === ac.lastPlayback.tplIndex &&
+            e.src === ac.lastPlayback.src;
+        });
+        if (i < 0) {
+          stopPackLoop();
+        }
+      }
+    }
+    if (packLoopBtnEl) {
+      packLoopBtnEl.disabled = buildPackQueue().length === 0;
+    }
+    syncPlaybackDom();
+  }
+
+  function renderAudioControls(qIndex, tplIndex, src) {
+    const wrap = document.createElement('div');
+    wrap.className = 'audio-controls';
+
+    const loopBtn = document.createElement('button');
+    loopBtn.type = 'button';
+    loopBtn.className = 'loop-mini-btn loop-single';
+    loopBtn.setAttribute('aria-label', '單曲循環');
+    const loopImg = document.createElement('img');
+    loopImg.src = 'loop-mini.png';
+    loopImg.alt = '';
+    loopBtn.appendChild(loopImg);
+    loopBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setActive(qIndex);
+      toggleSingleLoop(qIndex);
+    });
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'audio-btn';
     btn.textContent = '🔊';
     btn.setAttribute('aria-label', '播放語音');
-    const audio = new Audio(src);
-    function clearState() {
-      sectionEl.classList.remove('audio-playing');
-      btn.classList.remove('is-playing');
-    }
-    btn.onclick = function () {
-      audio.currentTime = 0;
-      sectionEl.classList.add('audio-playing');
-      btn.classList.add('is-playing');
-      audio.play();
-    };
-    audio.addEventListener('ended', clearState);
-    audio.addEventListener('pause', clearState);
-    return btn;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setActive(qIndex);
+      playOnce(qIndex, tplIndex, src);
+    });
+
+    wrap.appendChild(loopBtn);
+    wrap.appendChild(btn);
+    return wrap;
   }
 
   function render() {
@@ -186,7 +456,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       const variantAudio = getVariantAudio(q, tplIndex);
       if (variantAudio) {
         const box = section.querySelector('.box');
-        box.appendChild(renderAudioButton(variantAudio, section));
+        box.appendChild(renderAudioControls(qIndex, tplIndex, variantAudio));
       }
       const prevBtn = section.querySelector('.prev');
       const nextBtn = section.querySelector('.next');
@@ -224,6 +494,8 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
 
     const activeEl = container.querySelector('.section[data-q-index="' + state.activeQIndex + '"]');
     if (activeEl) activeEl.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+
+    syncAudioStateAfterRender();
   }
 
   function scrollToPrevNext(direction) {
@@ -271,11 +543,31 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     }
   });
 
-  // pack label
+  // pack label row + pack loop
   const packLabelEl = document.getElementById('pack-label');
   if (packLabelEl) {
     const raw = PACK.displayName || PACK.name || currentPack;
     packLabelEl.textContent = raw.replace(/-/g, ' ').toUpperCase();
+
+    const packRow = document.createElement('div');
+    packRow.className = 'pack-label-row';
+    packLabelEl.parentNode.insertBefore(packRow, packLabelEl);
+    packRow.appendChild(packLabelEl);
+
+    packLoopBtnEl = document.createElement('button');
+    packLoopBtnEl.id = 'pack-loop-btn';
+    packLoopBtnEl.type = 'button';
+    packLoopBtnEl.className = 'loop-mini-btn loop-pack';
+    packLoopBtnEl.setAttribute('aria-label', '全 pack 音頻順序循環');
+    const plImg = document.createElement('img');
+    plImg.src = 'loop-mini.png';
+    plImg.alt = '';
+    packLoopBtnEl.appendChild(plImg);
+    packLoopBtnEl.addEventListener('click', function () {
+      if (buildPackQueue().length === 0) return;
+      togglePackLoop();
+    });
+    packRow.appendChild(packLoopBtnEl);
   }
 
   // floating pack switch button
