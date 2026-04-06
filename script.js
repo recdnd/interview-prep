@@ -1,12 +1,13 @@
 // pack loader + viewer
 
 (function () {
-  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work"];
+  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special"];
   const PACK_LABEL = {
     "jp-interview": "JI",
     "cs-core": "CS",
     "en-interview": "EI",
-    "en-work": "EW"
+    "en-work": "EW",
+    "gaishi-special": "GS"
   };
   const LAST_PACK_KEY = "pp_last_pack";
 
