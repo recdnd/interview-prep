@@ -1,7 +1,33 @@
 // pack loader + viewer
 
+const SELECTED_PACK_KEY = "selectedPackKey";
+const PACK_PINNED_KEY = "packPinned";
+
+function getPackPinState() {
+  try {
+    return {
+      pinned: localStorage.getItem(PACK_PINNED_KEY) === "1",
+      key: localStorage.getItem(SELECTED_PACK_KEY) || ""
+    };
+  } catch (_) {
+    return { pinned: false, key: "" };
+  }
+}
+
+function setPackPinState(packKey) {
+  try {
+    if (packKey) {
+      localStorage.setItem(SELECTED_PACK_KEY, packKey);
+      localStorage.setItem(PACK_PINNED_KEY, "1");
+    } else {
+      localStorage.setItem(SELECTED_PACK_KEY, "");
+      localStorage.setItem(PACK_PINNED_KEY, "0");
+    }
+  } catch (_) {}
+}
+
 (function () {
-  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "es-deep-dive"];
+  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "es-deep-dive", "my-model"];
   const PACK_LABEL = {
     "jp-interview": "JI",
     "cs-core": "CS",
@@ -9,14 +35,35 @@
     "en-work": "EW",
     "gaishi-special": "GS",
     "gaishi-drill": "GD",
-    "es-deep-dive": "ES"
+    "es-deep-dive": "ES",
+    "my-model": "MM"
   };
   const LAST_PACK_KEY = "pp_last_pack";
 
   const params = new URLSearchParams(location.search);
-  let currentPack = params.get("pack") || localStorage.getItem(LAST_PACK_KEY) || "jp-interview";
+  const urlPack = params.get("pack");
 
-  // make sure unknown pack falls back to default
+  let savedPinned = false;
+  let savedPackKey = "";
+  try {
+    savedPinned = localStorage.getItem(PACK_PINNED_KEY) === "1";
+    savedPackKey = localStorage.getItem(SELECTED_PACK_KEY) || "";
+  } catch (_) {}
+  if (savedPinned && savedPackKey && !PACK_ORDER.includes(savedPackKey)) {
+    setPackPinState(null);
+    savedPinned = false;
+    savedPackKey = "";
+  }
+
+  let currentPack;
+  if (urlPack && PACK_ORDER.includes(urlPack)) {
+    currentPack = urlPack;
+  } else if (savedPinned && savedPackKey && PACK_ORDER.includes(savedPackKey)) {
+    currentPack = savedPackKey;
+  } else {
+    currentPack = localStorage.getItem(LAST_PACK_KEY) || "jp-interview";
+  }
+
   if (!PACK_ORDER.includes(currentPack)) currentPack = "jp-interview";
 
   const script = document.createElement("script");
@@ -44,6 +91,21 @@
 function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   const QUESTIONS = PACK.questions;
   const STORAGE_KEY = "pp_" + PACK.name;
+
+  let panelSelectedPack = null;
+  const pin = getPackPinState();
+  if (pin.pinned && pin.key && pin.key === currentPack && PACK_ORDER.includes(pin.key)) {
+    panelSelectedPack = pin.key;
+  }
+
+  function isMobileViewport() {
+    return typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 1023px)").matches;
+  }
+
+  function formatPackListLabel(key) {
+    return key.replace(/-/g, " ").toUpperCase();
+  }
 
   function loadState() {
     try {
@@ -573,13 +635,177 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     packRow.appendChild(packLoopBtnEl);
   }
 
+  function navigateToPack(key) {
+    if (!PACK_ORDER.includes(key)) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('pack', key);
+    window.location.href = url.toString();
+  }
+
+  function setPanelRowSelected(key) {
+    if (key) {
+      panelSelectedPack = key;
+      setPackPinState(key);
+    } else {
+      panelSelectedPack = null;
+      setPackPinState(null);
+    }
+  }
+
+  function renderPackPanel() {
+    const listEl = document.getElementById('pack-panel-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    PACK_ORDER.forEach(function (key) {
+      const row = document.createElement('div');
+      row.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
+      row.dataset.pack = key;
+
+      const arrow = document.createElement('button');
+      arrow.type = 'button';
+      arrow.className = 'pack-item-arrow';
+      arrow.textContent = '\u27A2';
+      arrow.setAttribute('aria-label', '切換至 ' + key);
+      arrow.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setPanelRowSelected(key);
+        renderPackPanel();
+        if (key !== currentPack) {
+          navigateToPack(key);
+        }
+      });
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'pack-item-name';
+      nameEl.textContent = key;
+      nameEl.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (panelSelectedPack === key) {
+          setPanelRowSelected(null);
+          renderPackPanel();
+          return;
+        }
+        setPanelRowSelected(key);
+        renderPackPanel();
+        if (key !== currentPack) {
+          navigateToPack(key);
+        }
+      });
+
+      row.appendChild(arrow);
+      row.appendChild(nameEl);
+      listEl.appendChild(row);
+    });
+  }
+
+  function renderMobilePackDrawer() {
+    const listEl = document.getElementById('pack-mobile-drawer-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    PACK_ORDER.forEach(function (key) {
+      const row = document.createElement('div');
+      row.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
+      row.dataset.pack = key;
+
+      const arrow = document.createElement('button');
+      arrow.type = 'button';
+      arrow.className = 'pack-item-arrow';
+      arrow.textContent = '\u27A2';
+      arrow.setAttribute('aria-label', '切換至 ' + key);
+      arrow.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setPanelRowSelected(key);
+        renderPackPanel();
+        renderMobilePackDrawer();
+        if (key !== currentPack) {
+          navigateToPack(key);
+        }
+      });
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'pack-item-name';
+      nameEl.textContent = formatPackListLabel(key);
+      nameEl.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (panelSelectedPack === key) {
+          setPanelRowSelected(null);
+          renderPackPanel();
+          renderMobilePackDrawer();
+          const drawer = document.getElementById('pack-mobile-drawer');
+          if (drawer) drawer.classList.remove('is-open');
+          if (packBtn) packBtn.setAttribute('aria-expanded', 'false');
+          return;
+        }
+        setPanelRowSelected(key);
+        renderPackPanel();
+        renderMobilePackDrawer();
+        if (key !== currentPack) {
+          navigateToPack(key);
+        }
+      });
+
+      row.appendChild(arrow);
+      row.appendChild(nameEl);
+      listEl.appendChild(row);
+    });
+  }
+
+  const mobileDrawer = document.createElement('div');
+  mobileDrawer.id = 'pack-mobile-drawer';
+  mobileDrawer.setAttribute('aria-label', 'Pack list');
+  const mobileList = document.createElement('div');
+  mobileList.id = 'pack-mobile-drawer-list';
+  mobileDrawer.appendChild(mobileList);
+  document.body.appendChild(mobileDrawer);
+
+  mobileDrawer.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+
   // floating pack switch button
   const packBtn = document.createElement('div');
   packBtn.id = 'pack-switch';
   packBtn.textContent = PACK_LABEL[currentPack] || '🌐';
+  packBtn.setAttribute('role', 'button');
+  packBtn.setAttribute('tabindex', '0');
+  packBtn.setAttribute('aria-expanded', 'false');
+  packBtn.setAttribute('aria-haspopup', 'true');
+  packBtn.setAttribute('aria-controls', 'pack-mobile-drawer');
   document.body.appendChild(packBtn);
 
-  packBtn.addEventListener('click', function () {
+  document.body.addEventListener('click', function (ev) {
+    const drawer = document.getElementById('pack-mobile-drawer');
+    if (!drawer || !drawer.classList.contains('is-open') || !isMobileViewport()) return;
+    if (drawer.contains(ev.target) || packBtn.contains(ev.target)) return;
+    drawer.classList.remove('is-open');
+    packBtn.setAttribute('aria-expanded', 'false');
+  });
+
+  packBtn.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    packBtn.click();
+  });
+
+  packBtn.addEventListener('click', function (e) {
+    if (isMobileViewport()) {
+      e.stopPropagation();
+      const drawer = document.getElementById('pack-mobile-drawer');
+      if (!drawer) return;
+      drawer.classList.toggle('is-open');
+      if (drawer.classList.contains('is-open')) {
+        renderMobilePackDrawer();
+      }
+      packBtn.setAttribute('aria-expanded', drawer.classList.contains('is-open') ? 'true' : 'false');
+      return;
+    }
+    setPanelRowSelected(null);
+    renderPackPanel();
+    renderMobilePackDrawer();
     const idx = PACK_ORDER.indexOf(currentPack);
     const nextIndex = (idx + 1) % PACK_ORDER.length;
     const nextPack = PACK_ORDER[nextIndex];
@@ -588,5 +814,15 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     window.location.href = url.toString();
   });
 
+  window.addEventListener('resize', function () {
+    if (!isMobileViewport()) {
+      const drawer = document.getElementById('pack-mobile-drawer');
+      if (drawer) drawer.classList.remove('is-open');
+      packBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  renderPackPanel();
+  renderMobilePackDrawer();
   render();
 }
