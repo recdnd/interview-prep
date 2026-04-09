@@ -103,7 +103,11 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   transform: scale(1.08);
 }
 
-/* mobile: 左下角按鈕上方超薄抽屜，僅 .is-open 顯示 */
+#pack-drawer-toggle {
+  display: none;
+}
+
+/* mobile: 左下角按鈕上方超薄抽屜，僅 .is-open 顯示；右下角 ◿ 僅開關抽屜 */
 #pack-mobile-drawer {
   display: none;
 }
@@ -113,11 +117,45 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
     display: none !important;
   }
 
+  #pack-drawer-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    z-index: 9999;
+    margin: 0;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 20px;
+    line-height: 1;
+    color: rgba(200, 60, 120, 0.95);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.95;
+    transition: opacity 0.15s ease;
+  }
+
+  #pack-drawer-toggle:hover {
+    opacity: 1;
+  }
+
+  #pack-drawer-toggle:active {
+    opacity: 0.72;
+  }
+
   #pack-mobile-drawer.is-open {
     display: block;
     position: fixed;
-    left: 18px;
-    bottom: 58px;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: calc(max(12px, env(safe-area-inset-bottom, 0px)) + 48px);
     width: 142px;
     max-height: 5.75rem;
     overflow-y: auto;
@@ -154,7 +192,7 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
     line-height: 1.25;
     font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
     letter-spacing: 0.03em;
-    cursor: default;
+    cursor: pointer;
     user-select: none;
     transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
   }
@@ -174,30 +212,27 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
     text-shadow: 0 0 8px rgba(255, 180, 195, 0.28);
   }
 
-  #pack-mobile-drawer .pack-item-arrow {
+  #pack-mobile-drawer .pack-item-prefix {
     display: inline-block;
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    color: rgba(110, 65, 78, 0.92);
     font: inherit;
     line-height: 1;
-    cursor: pointer;
     text-align: left;
+    color: inherit;
   }
 
   #pack-mobile-drawer .pack-item-name {
     min-width: 0;
     white-space: normal;
     word-break: break-word;
-    cursor: pointer;
   }
 }
 
 @media (min-width: 1024px) {
   #pack-mobile-drawer {
+    display: none !important;
+  }
+
+  #pack-drawer-toggle {
     display: none !important;
   }
 }
@@ -249,7 +284,7 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
     line-height: 1.25;
     font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
     letter-spacing: 0.03em;
-    cursor: default;
+    cursor: pointer;
     user-select: none;
     transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
   }
@@ -270,28 +305,17 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
     text-shadow: 0 0 10px rgba(255, 180, 195, 0.35);
   }
 
-  .pack-item-arrow {
+  .pack-item-prefix {
     display: inline-block;
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    color: rgba(110, 65, 78, 0.92);
     font: inherit;
     line-height: 1;
-    cursor: pointer;
     text-align: left;
-  }
-
-  .pack-item-arrow:hover {
-    color: rgba(40, 22, 30, 1);
+    color: inherit;
   }
 
   .pack-item-name {
     min-width: 0;
     white-space: normal;
     word-break: break-word;
-    cursor: pointer;
   }
 }
