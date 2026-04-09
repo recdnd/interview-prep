@@ -26,8 +26,24 @@ function setPackPinState(packKey) {
   } catch (_) {}
 }
 
+const PACK_DRAWER_OPEN_KEY = "packDrawerOpen";
+
+function setDrawerOpenState(isOpen) {
+  try {
+    sessionStorage.setItem(PACK_DRAWER_OPEN_KEY, isOpen ? "1" : "0");
+  } catch (_) {}
+}
+
+function getDrawerOpenState() {
+  try {
+    return sessionStorage.getItem(PACK_DRAWER_OPEN_KEY) === "1";
+  } catch (_) {
+    return false;
+  }
+}
+
 (function () {
-  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "es-deep-dive", "my-model"];
+  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "es-deep-dive", "my-model", "yt-ai-special", "my-model-full"];
   const PACK_LABEL = {
     "jp-interview": "JI",
     "cs-core": "CS",
@@ -36,7 +52,9 @@ function setPackPinState(packKey) {
     "gaishi-special": "GS",
     "gaishi-drill": "GD",
     "es-deep-dive": "ES",
-    "my-model": "MM"
+    "my-model": "MM",
+    "yt-ai-special": "YT",
+    "my-model-full": "MF"
   };
   const LAST_PACK_KEY = "pp_last_pack";
 
@@ -661,27 +679,15 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       row.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
       row.dataset.pack = key;
 
-      const arrow = document.createElement('button');
-      arrow.type = 'button';
-      arrow.className = 'pack-item-arrow';
-      arrow.textContent = '\u27A2';
-      arrow.setAttribute('aria-label', '切換至 ' + key);
-      arrow.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        setPanelRowSelected(key);
-        renderPackPanel();
-        if (key !== currentPack) {
-          navigateToPack(key);
-        }
-      });
+      const prefix = document.createElement('span');
+      prefix.className = 'pack-item-prefix';
+      prefix.textContent = '\u27A2';
 
       const nameEl = document.createElement('span');
       nameEl.className = 'pack-item-name';
       nameEl.textContent = key;
-      nameEl.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+
+      row.addEventListener('click', function () {
         if (panelSelectedPack === key) {
           setPanelRowSelected(null);
           renderPackPanel();
@@ -694,10 +700,18 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
         }
       });
 
-      row.appendChild(arrow);
+      row.appendChild(prefix);
       row.appendChild(nameEl);
       listEl.appendChild(row);
     });
+  }
+
+  function closeMobileDrawer() {
+    const drawer = document.getElementById('pack-mobile-drawer');
+    if (drawer) drawer.classList.remove('is-open');
+    const dt = document.getElementById('pack-drawer-toggle');
+    if (dt) dt.setAttribute('aria-expanded', 'false');
+    setDrawerOpenState(false);
   }
 
   function renderMobilePackDrawer() {
@@ -709,46 +723,34 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       row.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
       row.dataset.pack = key;
 
-      const arrow = document.createElement('button');
-      arrow.type = 'button';
-      arrow.className = 'pack-item-arrow';
-      arrow.textContent = '\u27A2';
-      arrow.setAttribute('aria-label', '切換至 ' + key);
-      arrow.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        setPanelRowSelected(key);
-        renderPackPanel();
-        renderMobilePackDrawer();
-        if (key !== currentPack) {
-          navigateToPack(key);
-        }
-      });
+      const prefix = document.createElement('span');
+      prefix.className = 'pack-item-prefix';
+      prefix.textContent = '\u27A2';
 
       const nameEl = document.createElement('span');
       nameEl.className = 'pack-item-name';
       nameEl.textContent = formatPackListLabel(key);
-      nameEl.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+
+      row.addEventListener('click', function () {
         if (panelSelectedPack === key) {
           setPanelRowSelected(null);
           renderPackPanel();
           renderMobilePackDrawer();
-          const drawer = document.getElementById('pack-mobile-drawer');
-          if (drawer) drawer.classList.remove('is-open');
-          if (packBtn) packBtn.setAttribute('aria-expanded', 'false');
+          closeMobileDrawer();
           return;
         }
         setPanelRowSelected(key);
         renderPackPanel();
         renderMobilePackDrawer();
         if (key !== currentPack) {
+          if (isMobileViewport()) setDrawerOpenState(true);
           navigateToPack(key);
+          return;
         }
+        if (isMobileViewport()) closeMobileDrawer();
       });
 
-      row.appendChild(arrow);
+      row.appendChild(prefix);
       row.appendChild(nameEl);
       listEl.appendChild(row);
     });
@@ -766,43 +768,11 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     e.stopPropagation();
   });
 
-  // floating pack switch button
-  const packBtn = document.createElement('div');
-  packBtn.id = 'pack-switch';
-  packBtn.textContent = PACK_LABEL[currentPack] || '🌐';
-  packBtn.setAttribute('role', 'button');
-  packBtn.setAttribute('tabindex', '0');
-  packBtn.setAttribute('aria-expanded', 'false');
-  packBtn.setAttribute('aria-haspopup', 'true');
-  packBtn.setAttribute('aria-controls', 'pack-mobile-drawer');
-  document.body.appendChild(packBtn);
-
-  document.body.addEventListener('click', function (ev) {
+  function goToNextPack() {
     const drawer = document.getElementById('pack-mobile-drawer');
-    if (!drawer || !drawer.classList.contains('is-open') || !isMobileViewport()) return;
-    if (drawer.contains(ev.target) || packBtn.contains(ev.target)) return;
-    drawer.classList.remove('is-open');
-    packBtn.setAttribute('aria-expanded', 'false');
-  });
+    const wasOpen = isMobileViewport() && drawer && drawer.classList.contains('is-open');
+    setDrawerOpenState(!!wasOpen);
 
-  packBtn.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    packBtn.click();
-  });
-
-  packBtn.addEventListener('click', function (e) {
-    if (isMobileViewport()) {
-      e.stopPropagation();
-      const drawer = document.getElementById('pack-mobile-drawer');
-      if (!drawer) return;
-      drawer.classList.toggle('is-open');
-      if (drawer.classList.contains('is-open')) {
-        renderMobilePackDrawer();
-      }
-      packBtn.setAttribute('aria-expanded', drawer.classList.contains('is-open') ? 'true' : 'false');
-      return;
-    }
     setPanelRowSelected(null);
     renderPackPanel();
     renderMobilePackDrawer();
@@ -812,17 +782,78 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     const url = new URL(window.location.href);
     url.searchParams.set('pack', nextPack);
     window.location.href = url.toString();
+  }
+
+  // floating pack switch button（mobile / desktop 均為單擊切下一個 pack）
+  const packBtn = document.createElement('div');
+  packBtn.id = 'pack-switch';
+  packBtn.textContent = PACK_LABEL[currentPack] || '🌐';
+  packBtn.setAttribute('role', 'button');
+  packBtn.setAttribute('tabindex', '0');
+  document.body.appendChild(packBtn);
+
+  const drawerToggle = document.createElement('button');
+  drawerToggle.id = 'pack-drawer-toggle';
+  drawerToggle.type = 'button';
+  drawerToggle.textContent = '\u25FF';
+  drawerToggle.setAttribute('aria-label', 'Pack 列表');
+  drawerToggle.setAttribute('aria-expanded', 'false');
+  drawerToggle.setAttribute('aria-controls', 'pack-mobile-drawer');
+  drawerToggle.setAttribute('aria-haspopup', 'true');
+  document.body.appendChild(drawerToggle);
+
+  document.body.addEventListener('click', function (ev) {
+    const drawer = document.getElementById('pack-mobile-drawer');
+    if (!drawer || !drawer.classList.contains('is-open') || !isMobileViewport()) return;
+    if (drawer.contains(ev.target) || drawerToggle.contains(ev.target)) return;
+    closeMobileDrawer();
+  });
+
+  packBtn.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    packBtn.click();
+  });
+
+  packBtn.addEventListener('click', function () {
+    goToNextPack();
+  });
+
+  drawerToggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!isMobileViewport()) return;
+    const drawer = document.getElementById('pack-mobile-drawer');
+    if (!drawer) return;
+    drawer.classList.toggle('is-open');
+    if (drawer.classList.contains('is-open')) {
+      renderMobilePackDrawer();
+    }
+    const isOpen = drawer.classList.contains('is-open');
+    drawerToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    setDrawerOpenState(isOpen);
+  });
+
+  drawerToggle.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    drawerToggle.click();
   });
 
   window.addEventListener('resize', function () {
-    if (!isMobileViewport()) {
-      const drawer = document.getElementById('pack-mobile-drawer');
-      if (drawer) drawer.classList.remove('is-open');
-      packBtn.setAttribute('aria-expanded', 'false');
-    }
+    if (!isMobileViewport()) closeMobileDrawer();
   });
 
   renderPackPanel();
   renderMobilePackDrawer();
   render();
+
+  if (isMobileViewport() && getDrawerOpenState()) {
+    const drawer = document.getElementById('pack-mobile-drawer');
+    const dt = document.getElementById('pack-drawer-toggle');
+    if (drawer && dt) {
+      drawer.classList.add('is-open');
+      dt.setAttribute('aria-expanded', 'true');
+      renderMobilePackDrawer();
+    }
+  }
 }
