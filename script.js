@@ -26,20 +26,30 @@ function setPackPinState(packKey) {
   } catch (_) {}
 }
 
+/** @typedef {"none"|"pack"|"question"} MobileDrawerType */
+const MOBILE_DRAWER_STATE_KEY = "mobileDrawerType";
 const PACK_DRAWER_OPEN_KEY = "packDrawerOpen";
 
-function setDrawerOpenState(isOpen) {
+function getMobileDrawerState() {
   try {
-    sessionStorage.setItem(PACK_DRAWER_OPEN_KEY, isOpen ? "1" : "0");
-  } catch (_) {}
+    const v = sessionStorage.getItem(MOBILE_DRAWER_STATE_KEY);
+    if (v === "pack" || v === "question") return v;
+    if (sessionStorage.getItem(PACK_DRAWER_OPEN_KEY) === "1") return "pack";
+    return "none";
+  } catch (_) {
+    return "none";
+  }
 }
 
-function getDrawerOpenState() {
+function setMobileDrawerState(type) {
   try {
-    return sessionStorage.getItem(PACK_DRAWER_OPEN_KEY) === "1";
-  } catch (_) {
-    return false;
-  }
+    if (type === "none") {
+      sessionStorage.removeItem(MOBILE_DRAWER_STATE_KEY);
+      sessionStorage.removeItem(PACK_DRAWER_OPEN_KEY);
+    } else {
+      sessionStorage.setItem(MOBILE_DRAWER_STATE_KEY, type);
+    }
+  } catch (_) {}
 }
 
 function isValidPackPayload(p) {
@@ -638,10 +648,28 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       container.appendChild(section);
     });
 
-    const activeEl = container.querySelector('.section[data-q-index="' + state.activeQIndex + '"]');
-    if (activeEl) activeEl.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-
     syncAudioStateAfterRender();
+    renderQuestionPanel();
+    renderMobileQuestionDrawer();
+  }
+
+  /** 將指定題目的 section 頂緣對齊視口上緣（略留 offset）；不 smooth。 */
+  function scrollQuestionToViewportTop(qIndex) {
+    if (qIndex < 0 || qIndex >= QUESTIONS.length) return;
+    requestAnimationFrame(function () {
+      const target = document.querySelector('.section[data-q-index="' + qIndex + '"]');
+      if (!target) return;
+      const topOffset = 8;
+      const y = window.scrollY + target.getBoundingClientRect().top - topOffset;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
+    });
+  }
+
+  function jumpToQuestion(qIndex) {
+    if (qIndex < 0 || qIndex >= QUESTIONS.length) return;
+    setActive(qIndex);
+    render();
+    scrollQuestionToViewportTop(qIndex);
   }
 
   function scrollToPrevNext(direction) {
@@ -769,12 +797,85 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     });
   }
 
-  function closeMobileDrawer() {
-    const drawer = document.getElementById('pack-mobile-drawer');
-    if (drawer) drawer.classList.remove('is-open');
-    const dt = document.getElementById('pack-drawer-toggle');
-    if (dt) dt.setAttribute('aria-expanded', 'false');
-    setDrawerOpenState(false);
+  function closeAllMobileDrawers() {
+    const packDrawer = document.getElementById('pack-mobile-drawer');
+    const questionDrawer = document.getElementById('question-mobile-drawer');
+    const packTg = document.getElementById('pack-drawer-toggle');
+    const questionTg = document.getElementById('question-drawer-toggle');
+    if (packDrawer) packDrawer.classList.remove('is-open');
+    if (questionDrawer) questionDrawer.classList.remove('is-open');
+    if (packTg) packTg.setAttribute('aria-expanded', 'false');
+    if (questionTg) questionTg.setAttribute('aria-expanded', 'false');
+    setMobileDrawerState('none');
+  }
+
+  function openMobileDrawer(type) {
+    closeAllMobileDrawers();
+    if (type === 'pack') {
+      const drawer = document.getElementById('pack-mobile-drawer');
+      const dt = document.getElementById('pack-drawer-toggle');
+      if (drawer) {
+        drawer.classList.add('is-open');
+        renderMobilePackDrawer();
+      }
+      if (dt) dt.setAttribute('aria-expanded', 'true');
+    } else if (type === 'question') {
+      const drawer = document.getElementById('question-mobile-drawer');
+      const dt = document.getElementById('question-drawer-toggle');
+      if (drawer) {
+        drawer.classList.add('is-open');
+        renderMobileQuestionDrawer();
+      }
+      if (dt) dt.setAttribute('aria-expanded', 'true');
+    }
+    setMobileDrawerState(type);
+  }
+
+  function renderQuestionPanel() {
+    const listEl = document.getElementById('question-panel-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    QUESTIONS.forEach(function (q, qIndex) {
+      const row = document.createElement('div');
+      row.className = 'question-item' + (state.activeQIndex === qIndex ? ' active' : '');
+      row.dataset.qIndex = String(qIndex);
+      const prefix = document.createElement('span');
+      prefix.className = 'question-item-prefix';
+      prefix.textContent = '\u27A2';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'question-item-name';
+      nameEl.textContent = q.title || '';
+      row.addEventListener('click', function () {
+        jumpToQuestion(qIndex);
+      });
+      row.appendChild(prefix);
+      row.appendChild(nameEl);
+      listEl.appendChild(row);
+    });
+  }
+
+  function renderMobileQuestionDrawer() {
+    const listEl = document.getElementById('question-mobile-drawer-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    QUESTIONS.forEach(function (q, qIndex) {
+      const row = document.createElement('div');
+      row.className = 'question-item' + (state.activeQIndex === qIndex ? ' active' : '');
+      row.dataset.qIndex = String(qIndex);
+      const prefix = document.createElement('span');
+      prefix.className = 'question-item-prefix';
+      prefix.textContent = '\u27A2';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'question-item-name';
+      nameEl.textContent = q.title || '';
+      row.addEventListener('click', function () {
+        closeAllMobileDrawers();
+        jumpToQuestion(qIndex);
+      });
+      row.appendChild(prefix);
+      row.appendChild(nameEl);
+      listEl.appendChild(row);
+    });
   }
 
   function renderMobilePackDrawer() {
@@ -799,18 +900,18 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
           setPanelRowSelected(null);
           renderPackPanel();
           renderMobilePackDrawer();
-          closeMobileDrawer();
+          closeAllMobileDrawers();
           return;
         }
         setPanelRowSelected(key);
         renderPackPanel();
         renderMobilePackDrawer();
         if (key !== currentPack) {
-          if (isMobileViewport()) setDrawerOpenState(true);
+          if (isMobileViewport()) setMobileDrawerState('pack');
           navigateToPack(key);
           return;
         }
-        if (isMobileViewport()) closeMobileDrawer();
+        if (isMobileViewport()) closeAllMobileDrawers();
       });
 
       row.appendChild(prefix);
@@ -831,11 +932,19 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     e.stopPropagation();
   });
 
-  function goToNextPack() {
-    const drawer = document.getElementById('pack-mobile-drawer');
-    const wasOpen = isMobileViewport() && drawer && drawer.classList.contains('is-open');
-    setDrawerOpenState(!!wasOpen);
+  const questionMobileDrawer = document.createElement('div');
+  questionMobileDrawer.id = 'question-mobile-drawer';
+  questionMobileDrawer.setAttribute('aria-label', 'Question list');
+  const questionMobileList = document.createElement('div');
+  questionMobileList.id = 'question-mobile-drawer-list';
+  questionMobileDrawer.appendChild(questionMobileList);
+  document.body.appendChild(questionMobileDrawer);
 
+  questionMobileDrawer.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+
+  function goToNextPack() {
     setPanelRowSelected(null);
     renderPackPanel();
     renderMobilePackDrawer();
@@ -865,11 +974,28 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   drawerToggle.setAttribute('aria-haspopup', 'true');
   document.body.appendChild(drawerToggle);
 
+  const questionDrawerToggle = document.createElement('button');
+  questionDrawerToggle.id = 'question-drawer-toggle';
+  questionDrawerToggle.type = 'button';
+  questionDrawerToggle.textContent = '\u2261';
+  questionDrawerToggle.setAttribute('aria-label', '題目列表');
+  questionDrawerToggle.setAttribute('aria-expanded', 'false');
+  questionDrawerToggle.setAttribute('aria-controls', 'question-mobile-drawer');
+  questionDrawerToggle.setAttribute('aria-haspopup', 'true');
+  document.body.appendChild(questionDrawerToggle);
+
   document.body.addEventListener('click', function (ev) {
-    const drawer = document.getElementById('pack-mobile-drawer');
-    if (!drawer || !drawer.classList.contains('is-open') || !isMobileViewport()) return;
-    if (drawer.contains(ev.target) || drawerToggle.contains(ev.target)) return;
-    closeMobileDrawer();
+    if (!isMobileViewport()) return;
+    const packDrawer = document.getElementById('pack-mobile-drawer');
+    const qDrawer = document.getElementById('question-mobile-drawer');
+    const packOpen = packDrawer && packDrawer.classList.contains('is-open');
+    const qOpen = qDrawer && qDrawer.classList.contains('is-open');
+    if (!packOpen && !qOpen) return;
+    if (packDrawer && packDrawer.contains(ev.target)) return;
+    if (qDrawer && qDrawer.contains(ev.target)) return;
+    if (drawerToggle.contains(ev.target)) return;
+    if (questionDrawerToggle.contains(ev.target)) return;
+    closeAllMobileDrawers();
   });
 
   packBtn.addEventListener('keydown', function (e) {
@@ -886,14 +1012,11 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     e.stopPropagation();
     if (!isMobileViewport()) return;
     const drawer = document.getElementById('pack-mobile-drawer');
-    if (!drawer) return;
-    drawer.classList.toggle('is-open');
-    if (drawer.classList.contains('is-open')) {
-      renderMobilePackDrawer();
+    if (drawer && drawer.classList.contains('is-open')) {
+      closeAllMobileDrawers();
+      return;
     }
-    const isOpen = drawer.classList.contains('is-open');
-    drawerToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    setDrawerOpenState(isOpen);
+    openMobileDrawer('pack');
   });
 
   drawerToggle.addEventListener('keydown', function (e) {
@@ -902,21 +1025,38 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     drawerToggle.click();
   });
 
+  questionDrawerToggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!isMobileViewport()) return;
+    const drawer = document.getElementById('question-mobile-drawer');
+    if (drawer && drawer.classList.contains('is-open')) {
+      closeAllMobileDrawers();
+      return;
+    }
+    openMobileDrawer('question');
+  });
+
+  questionDrawerToggle.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    questionDrawerToggle.click();
+  });
+
   window.addEventListener('resize', function () {
-    if (!isMobileViewport()) closeMobileDrawer();
+    if (!isMobileViewport()) closeAllMobileDrawers();
   });
 
   renderPackPanel();
   renderMobilePackDrawer();
   render();
+  scrollQuestionToViewportTop(state.activeQIndex);
 
-  if (isMobileViewport() && getDrawerOpenState()) {
-    const drawer = document.getElementById('pack-mobile-drawer');
-    const dt = document.getElementById('pack-drawer-toggle');
-    if (drawer && dt) {
-      drawer.classList.add('is-open');
-      dt.setAttribute('aria-expanded', 'true');
-      renderMobilePackDrawer();
+  if (isMobileViewport()) {
+    const st = getMobileDrawerState();
+    if (st === 'pack') {
+      openMobileDrawer('pack');
+    } else if (st === 'question') {
+      openMobileDrawer('question');
     }
   }
 }
