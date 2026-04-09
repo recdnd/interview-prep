@@ -118,28 +118,23 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   }
 
   #pack-drawer-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     position: fixed;
-    right: max(12px, env(safe-area-inset-right, 0px));
-    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    right: 18px;
+    bottom: 18px;
     z-index: 9999;
     margin: 0;
-    min-width: 44px;
-    min-height: 44px;
     padding: 0;
     border: none;
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    font-size: 20px;
+    font-size: 17px;
     line-height: 1;
-    color: rgba(200, 60, 120, 0.95);
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.9);
+    color: rgba(255, 105, 180, 0.92);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    opacity: 0.95;
+    opacity: 0.88;
     transition: opacity 0.15s ease;
   }
 
@@ -154,8 +149,8 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   #pack-mobile-drawer.is-open {
     display: block;
     position: fixed;
-    right: max(12px, env(safe-area-inset-right, 0px));
-    bottom: calc(max(12px, env(safe-area-inset-bottom, 0px)) + 48px);
+    right: 18px;
+    bottom: 42px;
     width: 142px;
     max-height: 5.75rem;
     overflow-y: auto;

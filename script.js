@@ -42,6 +42,33 @@ function getDrawerOpenState() {
   }
 }
 
+function isValidPackPayload(p) {
+  return !!(p && Array.isArray(p.questions) && p.questions.length > 0);
+}
+
+function showPackLoadError(message) {
+  const label = document.getElementById("pack-label");
+  if (label) label.textContent = "載入失敗";
+  const sections = document.getElementById("sections");
+  if (!sections) return;
+  sections.textContent = "";
+  const box = document.createElement("div");
+  box.className = "box";
+  box.style.margin = "1rem";
+  const p1 = document.createElement("p");
+  p1.style.color = "#a40000";
+  p1.style.marginTop = "0";
+  p1.textContent = message || "無法載入題庫。";
+  box.appendChild(p1);
+  const p2 = document.createElement("p");
+  p2.style.fontSize = "0.875rem";
+  p2.style.marginBottom = "0";
+  p2.textContent =
+    "請在專案根目錄啟動本機伺服器後，用 http://127.0.0.1:8787/ 開啟（npm start 或 python3 -m http.server 8787）。不要用檔案總管直接雙擊開 HTML，否則 packs/ 腳本常會載入失敗。";
+  box.appendChild(p2);
+  sections.appendChild(box);
+}
+
 (function () {
   const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "es-deep-dive", "my-model", "yt-ai-special", "my-model-full"];
   const PACK_LABEL = {
@@ -84,24 +111,60 @@ function getDrawerOpenState() {
 
   if (!PACK_ORDER.includes(currentPack)) currentPack = "jp-interview";
 
-  const script = document.createElement("script");
-  script.src = "packs/" + currentPack + ".js";
-  script.onload = function () {
-    if (window.PACK && window.PACK.questions) {
-      localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
-      initApp(window.PACK, currentPack, PACK_ORDER, PACK_LABEL);
+  let jpFallbackInjected = false;
+
+  function boot(pack, routeKey) {
+    try {
+      initApp(pack, routeKey, PACK_ORDER, PACK_LABEL);
+    } catch (err) {
+      console.error(err);
+      showPackLoadError("頁面初始化錯誤：" + (err && err.message ? err.message : String(err)));
     }
-  };
-  script.onerror = function () {
+  }
+
+  function injectJpFallback() {
+    if (jpFallbackInjected) return;
+    jpFallbackInjected = true;
     const fallback = document.createElement("script");
     fallback.src = "packs/jp-interview.js";
     fallback.onload = function () {
-      if (window.PACK && window.PACK.questions) {
-        localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
-        initApp(window.PACK, "jp-interview", PACK_ORDER, PACK_LABEL);
+      if (isValidPackPayload(window.PACK)) {
+        try {
+          localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
+        } catch (_) {}
+        boot(window.PACK, "jp-interview");
+      } else {
+        showPackLoadError("jp-interview 題庫資料不完整或為空。");
       }
     };
+    fallback.onerror = function () {
+      showPackLoadError("無法載入 packs/jp-interview.js。請確認在專案根目錄啟動 HTTP 伺服器後再開啟。");
+    };
     document.head.appendChild(fallback);
+  }
+
+  const script = document.createElement("script");
+  script.src = "packs/" + currentPack + ".js";
+  script.onload = function () {
+    if (isValidPackPayload(window.PACK)) {
+      try {
+        localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
+      } catch (_) {}
+      boot(window.PACK, currentPack);
+      return;
+    }
+    if (currentPack === "jp-interview") {
+      showPackLoadError("jp-interview 沒有有效的題目資料（questions）。");
+      return;
+    }
+    injectJpFallback();
+  };
+  script.onerror = function () {
+    if (currentPack === "jp-interview") {
+      showPackLoadError("無法載入 packs/jp-interview.js。請用本機伺服器開啟專案根目錄，勿使用 file://。");
+      return;
+    }
+    injectJpFallback();
   };
   document.head.appendChild(script);
 })();
