@@ -1,0 +1,25 @@
+jp-interview 舊版錄音歸檔（對照 jp-interview-legacy pack）
+================================================================
+主站新版 jp-interview 已不含錄音欄位；音訊檔副本置於：
+  legacy/recordings/jp-interview-legacy/q{1..9}/a*.m4a
+題庫定義：packs/jp-interview-legacy.js（name: jp-interview-legacy）
+
+舊路徑 recordings/jp-interview/…  →  新路徑 legacy/recordings/jp-interview-legacy/…
+----------------------------------------------------------------
+q3/a1.m4a   →  q1/a1.m4a   題目「自己紹介」（舊 id 3）
+q4/a1.m4a   →  q2/a1.m4a   「なぜ日本で働きたいのか」
+q5/a1.m4a   →  q3/a1.m4a   「Spiralプロジェクトの説明」
+q6/a1.m4a   →  q4/a1.m4a   「強みは何ですか」
+q7/a1.m4a   →  q5/a1.m4a   「将来やりたいこと」
+q8/a1.m4a   →  q6/a1.m4a   「逆質問」
+q9/a1.m4a   →  q7/a1.m4a   「チームで意見が合わない時」variant 1
+q9/a2.m4a   →  q7/a2.m4a   同題 variant 2
+q10/a2.m4a  →  q8/a1.m4a   「困難な問題」（僅錄音的那一則答案）
+q14/a1.m4a  →  q9/a1.m4a   「英語力について」variant 1
+q14/a2.m4a  →  q9/a2.m4a   同題 variant 2
+
+根目錄 recordings/jp-interview/ 仍保留一份（與歸檔副本並存）；若需節省空間可手動刪除舊目錄。
+
+進入 legacy 子站：
+  · /legacy/index.html
+  · 或根目錄 index.html?pack=jp-interview-legacy

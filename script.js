@@ -1,5 +1,8 @@
 // pack loader + viewer
 
+/** 僅能透過 legacy/index.html 或 ?pack= 載入；不列入主選單 */
+const STANDALONE_PACK_NAMES = { "jp-interview-legacy": true };
+
 const SELECTED_PACK_KEY = "selectedPackKey";
 const PACK_PINNED_KEY = "packPinned";
 
@@ -125,7 +128,9 @@ function showPackLoadError(message) {
   }
 
   let currentPack;
-  if (urlPack && PACK_ORDER.includes(urlPack)) {
+  if (typeof window.__INITIAL_PACK__ === "string" && STANDALONE_PACK_NAMES[window.__INITIAL_PACK__]) {
+    currentPack = window.__INITIAL_PACK__;
+  } else if (urlPack && (PACK_ORDER.includes(urlPack) || STANDALONE_PACK_NAMES[urlPack])) {
     currentPack = urlPack;
   } else if (savedPinned && savedPackKey && PACK_ORDER.includes(savedPackKey)) {
     currentPack = savedPackKey;
@@ -133,7 +138,9 @@ function showPackLoadError(message) {
     currentPack = localStorage.getItem(LAST_PACK_KEY) || "jp-interview";
   }
 
-  if (!PACK_ORDER.includes(currentPack)) currentPack = "jp-interview";
+  if (!PACK_ORDER.includes(currentPack) && !STANDALONE_PACK_NAMES[currentPack]) {
+    currentPack = "jp-interview";
+  }
 
   let jpFallbackInjected = false;
 
@@ -171,9 +178,11 @@ function showPackLoadError(message) {
   script.src = "packs/" + currentPack + ".js";
   script.onload = function () {
     if (isValidPackPayload(window.PACK)) {
-      try {
-        localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
-      } catch (_) {}
+      if (!STANDALONE_PACK_NAMES[currentPack]) {
+        try {
+          localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
+        } catch (_) {}
+      }
       boot(window.PACK, currentPack);
       return;
     }
@@ -181,9 +190,17 @@ function showPackLoadError(message) {
       showPackLoadError("jp-interview 沒有有效的題目資料（questions）。");
       return;
     }
+    if (STANDALONE_PACK_NAMES[currentPack]) {
+      showPackLoadError("無法載入 " + currentPack + " 題庫資料。");
+      return;
+    }
     injectJpFallback();
   };
   script.onerror = function () {
+    if (STANDALONE_PACK_NAMES[currentPack]) {
+      showPackLoadError("無法載入 packs/" + currentPack + ".js。請確認本機 HTTP 伺服器與檔案路徑。");
+      return;
+    }
     if (currentPack === "jp-interview") {
       showPackLoadError("無法載入 packs/jp-interview.js。請用本機伺服器開啟專案根目錄，勿使用 file://。");
       return;
@@ -1000,6 +1017,9 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   packBtn.setAttribute('role', 'button');
   packBtn.setAttribute('tabindex', '0');
   document.body.appendChild(packBtn);
+  if (STANDALONE_PACK_NAMES[currentPack]) {
+    packBtn.style.display = 'none';
+  }
 
   const drawerToggle = document.createElement('button');
   drawerToggle.id = 'pack-drawer-toggle';

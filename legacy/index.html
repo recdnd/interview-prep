@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JP Interview Legacy · pp.bin.ooo</title>
+  <base href="../">
+  <link rel="icon" href="pin32.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="pack-panel" aria-label="Pack selector">
+    <div id="pack-panel-list"></div>
+  </div>
+  <div id="question-panel" aria-label="Question list">
+    <div id="question-panel-list"></div>
+  </div>
+  <div id="qn-box" class="helper-card helper-card--narrow has-top-controls" aria-label="Quick Note">
+    <div id="qn-head" class="helper-controls-top">
+      <button id="qn-clear" type="button" aria-label="Clear note">×</button>
+    </div>
+    <div class="helper-content">
+      <textarea id="qn-input" spellcheck="false" placeholder="note..."></textarea>
+    </div>
+    <div class="helper-controls-bottom"></div>
+  </div>
+  <div id="cce-box" class="helper-card has-top-controls" aria-label="CCE">
+    <div id="cce-modes" class="helper-controls-top">
+      <button id="cce-mode-auto" type="button" data-mode="auto" aria-label="CCE auto mode">A</button>
+      <button id="cce-mode-general" type="button" data-mode="general" aria-label="CCE general mode">G</button>
+      <button id="cce-mode-ux" type="button" data-mode="ux" aria-label="CCE UX mode">UX</button>
+      <button id="cce-mode-system" type="button" data-mode="system" aria-label="CCE system mode">SYS</button>
+    </div>
+    <div id="cce-content" class="helper-content"></div>
+    <div id="cce-actions" class="helper-controls-bottom">
+      <button id="cce-generate" type="button" aria-label="Generate CCE">⟳</button>
+    </div>
+  </div>
+  <div id="cre-box" class="helper-card has-top-controls" aria-label="CRE">
+    <div id="cre-head" class="helper-controls-top">
+      <button id="cre-mode-auto" type="button" data-cre-mode="auto" aria-label="CRE auto mode">A</button>
+      <button id="cre-mode-speak" type="button" data-cre-mode="speak" aria-label="CRE speak mode">S</button>
+      <button id="cre-mode-relay" type="button" data-cre-mode="relay" aria-label="CRE relay mode">R</button>
+    </div>
+    <div id="cre-content" class="helper-content"></div>
+    <div id="cre-actions" class="helper-controls-bottom">
+      <button id="cre-generate" type="button" aria-label="Generate CRE">⟳</button>
+    </div>
+  </div>
+  <div id="cbl-box" class="helper-card" aria-label="CBL">
+    <div id="cbl-content" class="helper-content"></div>
+    <div id="cbl-actions" class="helper-controls-bottom">
+      <button id="cbl-generate" type="button" aria-label="Generate CBL">⟳</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div id="pack-label" class="pack-label"></div>
+    <div id="sections"></div>
+  </div>
+  <script>window.__INITIAL_PACK__ = "jp-interview-legacy";</script>
+  <script src="script.js"></script>
+</body>
+</html>
