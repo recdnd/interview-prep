@@ -29,6 +29,7 @@ function setPackPinState(packKey) {
 /** @typedef {"none"|"pack"|"question"} MobileDrawerType */
 const MOBILE_DRAWER_STATE_KEY = "mobileDrawerType";
 const PACK_DRAWER_OPEN_KEY = "packDrawerOpen";
+const QN_STORAGE_KEY = "pp_quick_note";
 
 function getMobileDrawerState() {
   try {
@@ -49,6 +50,20 @@ function setMobileDrawerState(type) {
     } else {
       sessionStorage.setItem(MOBILE_DRAWER_STATE_KEY, type);
     }
+  } catch (_) {}
+}
+
+function loadQuickNote() {
+  try {
+    return localStorage.getItem(QN_STORAGE_KEY) || "";
+  } catch (_) {
+    return "";
+  }
+}
+
+function saveQuickNote(value) {
+  try {
+    localStorage.setItem(QN_STORAGE_KEY, value || "");
   } catch (_) {}
 }
 
@@ -80,7 +95,7 @@ function showPackLoadError(message) {
 }
 
 (function () {
-  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "es-deep-dive", "my-model", "yt-ai-special", "my-model-full"];
+  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "my-model", "yt-ai-special", "my-model-full"];
   const PACK_LABEL = {
     "jp-interview": "JI",
     "cs-core": "CS",
@@ -88,7 +103,6 @@ function showPackLoadError(message) {
     "en-work": "EW",
     "gaishi-special": "GS",
     "gaishi-drill": "GD",
-    "es-deep-dive": "ES",
     "my-model": "MM",
     "yt-ai-special": "YT",
     "my-model-full": "MF"
@@ -198,6 +212,26 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     return key.replace(/-/g, " ").toUpperCase();
   }
 
+  function setupQuickNote() {
+    const input = document.getElementById('qn-input');
+    const clearBtn = document.getElementById('qn-clear');
+    if (!input) return;
+
+    input.value = loadQuickNote();
+
+    input.addEventListener('input', function () {
+      saveQuickNote(input.value);
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        input.value = "";
+        saveQuickNote("");
+        input.focus();
+      });
+    }
+  }
+
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -276,9 +310,12 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     saveState();
   }
 
+  let onActiveQuestionChanged = function () {};
+
   function setActive(qIndex) {
     state.activeQIndex = qIndex;
     saveState();
+    onActiveQuestionChanged();
   }
 
   function escapeHtml(s) {
@@ -984,6 +1021,408 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   questionDrawerToggle.setAttribute('aria-haspopup', 'true');
   document.body.appendChild(questionDrawerToggle);
 
+  // CCE: conversation continuation engine（固定浮層，無 prompt，一鍵續接）
+  const cceBox = document.getElementById('cce-box');
+  const cceContent = document.getElementById('cce-content');
+  const cceGenerateBtn = document.getElementById('cce-generate');
+  const cceModeAutoBtn = document.getElementById('cce-mode-auto');
+  const cceModeGeneralBtn = document.getElementById('cce-mode-general');
+  const cceModeUxBtn = document.getElementById('cce-mode-ux');
+  const cceModeSystemBtn = document.getElementById('cce-mode-system');
+
+  const CHEAT = {
+    start: [
+      'そうですね、少し整理しながらお話しすると…',
+      '一言で言うのは難しいんですが…',
+      '実際に触ってみると感じるのは…',
+      'まだ完全に整理できているわけではないのですが…',
+      'いくつか観点があると思っていて…',
+      'まず前提として考えているのは…'
+    ],
+    mid: {
+      general: [
+        '自分はまず理解しやすさを優先しています。',
+        '完全な最適解というより、扱いやすさとのバランスで考えています。',
+        'このあたりは実装して初めて見えてくる部分も多くて…',
+        '実際の利用シーンを考えると、この選択が自然でした。',
+        'どこまで抽象化するかはかなり意識しています。',
+        '一見シンプルに見えるんですが、裏側では結構制約があります。'
+      ],
+      ux: [
+        'UXは見た目というより、構造の伝わり方だと考えています。',
+        'ユーザーが今何をしているか分かることを重要視しています。',
+        '操作できることより、迷わないことのほうが重要だと思っています。',
+        '学習コストが低いかどうかはかなり大きな要素です。',
+        'インターフェースの反応の一貫性をかなり意識しています。',
+        '体験と内部構造がズレすぎないことを重視しています。',
+        'ユーザーが受け身になりすぎない設計を意識しています。'
+      ],
+      system: [
+        '設計としては自然な形にフィットすることを優先しています。',
+        '状態を保存するより、状態を導出する方向で考えています。',
+        'イベント単位で構造を持たせる設計にしています。',
+        '責務の切り方はかなり慎重に決めています。',
+        '一貫性を保つ代わりに、実装コストはある程度許容しています。',
+        '構造的に説明可能であることを重視しています。',
+        '内部的には因果関係が追えるようにしています。'
+      ]
+    },
+    end: [
+      '現時点ではそのように考えています。',
+      'まだ試行中ですが、その方向で整理しています。',
+      '完全ではないですが、今はそういう理解です。',
+      '今のところはその設計で進めています。',
+      '実際にはケースによって変わると思いますが、基本的にはその考えです。',
+      'あくまで現時点での整理ですが、そのように捉えています。'
+    ]
+  };
+
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function clearChildren(el) {
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+  }
+
+  /** partId: logical slice key (e.g. start | mid | end | ack | ask | expand) for data-part + reroll routing */
+  function buildHelperBlock(partId, label, value, rerollFn) {
+    const block = document.createElement('div');
+    block.className = 'helper-block';
+    if (partId) block.setAttribute('data-part', partId);
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'helper-block-label';
+    labelEl.textContent = label;
+
+    const textEl = document.createElement('div');
+    textEl.className = 'helper-block-text';
+    textEl.textContent = value;
+    textEl.addEventListener('click', function (e) {
+      e.stopPropagation();
+      textEl.classList.add('is-rerolling');
+      const next = rerollFn();
+      if (typeof next === 'string') textEl.textContent = next;
+      window.setTimeout(function () {
+        textEl.classList.remove('is-rerolling');
+      }, 200);
+    });
+
+    block.appendChild(labelEl);
+    block.appendChild(textEl);
+    return block;
+  }
+
+  function inferCCEModeFromQuestionTitle(title) {
+    const t = String(title || '').toLowerCase();
+    if (!t) return 'general';
+    if (
+      t.includes('ux') ||
+      t.includes('ユーザー') ||
+      t.includes('プロダクト') ||
+      t.includes('体験')
+    ) return 'ux';
+    if (
+      t.includes('system') ||
+      t.includes('履歴') ||
+      t.includes('append-only') ||
+      t.includes('設計') ||
+      t.includes('説明可能性') ||
+      t.includes('構造') ||
+      t.includes('state')
+    ) return 'system';
+    return 'general';
+  }
+
+  let cceManualMode = null; // null = auto, otherwise 'general'|'ux'|'system'
+  let cceRendered = { mode: 'general', start: '', mid: '', end: '' };
+
+  function getActiveQuestionTitle() {
+    const q = QUESTIONS[state.activeQIndex];
+    return q && q.title ? q.title : '';
+  }
+
+  function resolveCCEMode() {
+    if (cceManualMode) return cceManualMode;
+    return inferCCEModeFromQuestionTitle(getActiveQuestionTitle());
+  }
+
+  function refreshCceModeUI(mode) {
+    cceModeAutoBtn.classList.toggle('active', cceManualMode === null);
+    cceModeGeneralBtn.classList.toggle('active', mode === 'general');
+    cceModeUxBtn.classList.toggle('active', mode === 'ux');
+    cceModeSystemBtn.classList.toggle('active', mode === 'system');
+  }
+
+  function renderCCEBlocks() {
+    clearChildren(cceContent);
+    cceContent.appendChild(buildHelperBlock('start', '[起手]', cceRendered.start, function () {
+      cceRendered.start = pick(CHEAT.start);
+      return cceRendered.start;
+    }));
+    cceContent.appendChild(buildHelperBlock('mid', '[中段]', cceRendered.mid, function () {
+      cceRendered.mid = pick(CHEAT.mid[cceRendered.mode]);
+      return cceRendered.mid;
+    }));
+    cceContent.appendChild(buildHelperBlock('end', '[収束]', cceRendered.end, function () {
+      cceRendered.end = pick(CHEAT.end);
+      return cceRendered.end;
+    }));
+  }
+
+  function generateCCE(mode) {
+    const useMode = mode || resolveCCEMode();
+    cceRendered = {
+      mode: useMode,
+      start: pick(CHEAT.start),
+      mid: pick(CHEAT.mid[useMode]),
+      end: pick(CHEAT.end)
+    };
+    renderCCEBlocks();
+    refreshCceModeUI(useMode);
+  }
+
+  if (cceBox && cceContent && cceGenerateBtn && cceModeAutoBtn && cceModeGeneralBtn && cceModeUxBtn && cceModeSystemBtn) {
+    cceGenerateBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      generateCCE();
+    });
+
+    cceModeAutoBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cceManualMode = null;
+      generateCCE();
+    });
+
+    cceModeGeneralBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cceManualMode = 'general';
+      generateCCE('general');
+    });
+    cceModeUxBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cceManualMode = 'ux';
+      generateCCE('ux');
+    });
+    cceModeSystemBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cceManualMode = 'system';
+      generateCCE('system');
+    });
+
+    onActiveQuestionChanged = function () {
+      if (cceManualMode === null) {
+        generateCCE();
+      } else {
+        refreshCceModeUI(cceManualMode);
+      }
+    };
+
+    generateCCE();
+  }
+
+  // CBL: catch ball layer（接球 + 輕反問 + つなぎ）
+  const cblBox = document.getElementById('cbl-box');
+  const cblContent = document.getElementById('cbl-content');
+  const cblGenerateBtn = document.getElementById('cbl-generate');
+
+  const CBL = {
+    ack: [
+      'なるほど、その視点はすごく重要だと思います。',
+      '確かに、その考え方はかなり納得感があります。',
+      'そこは実際にやってみると差が出る部分ですよね。',
+      'その話、すごくリアルだなと感じました。',
+      '自分もその点はかなり共感があります。',
+      'その前提で考えるのは自然だと思います。',
+      'そこは見落としがちですが大事なポイントですよね。',
+      'その整理の仕方はすごく分かりやすいです。'
+    ],
+    ask: [
+      'ちなみに、そのあたりは実際にはどのように運用されることが多いのでしょうか。',
+      'その点について、現場ではどのような判断が多いのでしょうか。',
+      '御社の場合だと、どちらを優先されるケースが多いですか。',
+      'その部分で難しくなりやすいポイントはどこにありますか。',
+      '逆に、その設計で問題になるケースはありますか。',
+      'もう少し具体的な事例があればぜひ伺いたいです。',
+      'その判断基準はどのように決められているのでしょうか。',
+      '実際にはどの程度まで抽象化されているのでしょうか。'
+    ],
+    expand: [
+      '自分もそのあたりはもう少し理解を深めたいと思っていて…',
+      'まだ完全に整理できているわけではないのですが…',
+      '実際に触れてみないと分からない部分も多いと感じています。',
+      '少し自分の中でも考えながら聞いているのですが…',
+      'その点は今ちょうど関心がある部分でもあります。',
+      '自分の中でもまだ仮説段階なのですが…',
+      'もう少し解像度を上げたいと思っているところです。',
+      '今まさにその部分をどう捉えるか考えていました。'
+    ]
+  };
+
+  let cblRendered = { ack: '', ask: '', expand: '' };
+
+  function renderCBLBlocks() {
+    clearChildren(cblContent);
+    cblContent.appendChild(buildHelperBlock('ack', '[接球]', cblRendered.ack, function () {
+      cblRendered.ack = pick(CBL.ack);
+      return cblRendered.ack;
+    }));
+    cblContent.appendChild(buildHelperBlock('ask', '[軽い反問]', cblRendered.ask, function () {
+      cblRendered.ask = pick(CBL.ask);
+      return cblRendered.ask;
+    }));
+    cblContent.appendChild(buildHelperBlock('expand', '[つなぎ]', cblRendered.expand, function () {
+      cblRendered.expand = pick(CBL.expand);
+      return cblRendered.expand;
+    }));
+  }
+
+  function generateCBL() {
+    cblRendered = {
+      ack: pick(CBL.ack),
+      ask: pick(CBL.ask),
+      expand: pick(CBL.expand)
+    };
+    renderCBLBlocks();
+  }
+
+  if (cblBox && cblContent && cblGenerateBtn) {
+    cblGenerateBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      generateCBL();
+    });
+    generateCBL();
+  }
+
+  // CRE: conversation relay engine（CCE + CBL 混合入口）
+  const creBox = document.getElementById('cre-box');
+  const creContent = document.getElementById('cre-content');
+  const creGenerateBtn = document.getElementById('cre-generate');
+  const creModeAutoBtn = document.getElementById('cre-mode-auto');
+  const creModeSpeakBtn = document.getElementById('cre-mode-speak');
+  const creModeRelayBtn = document.getElementById('cre-mode-relay');
+
+  let creMode = 'auto'; // auto | speak | relay
+  let creRendered = {
+    resolvedMode: 'speak',
+    speakSubtype: 'general',
+    start: '',
+    mid: '',
+    end: '',
+    ack: '',
+    ask: '',
+    expand: ''
+  };
+
+  function inferSpeakSubtype(title) {
+    const t = String(title || '').toLowerCase();
+    if (/ux|ユーザー|主体性|プロダクト/.test(t)) return 'ux';
+    if (/system|履歴|append|設計|説明可能性|構造|state/.test(t)) return 'system';
+    return 'general';
+  }
+
+  function inferCREMode(title) {
+    const t = String(title || '').toLowerCase();
+    if (/逆質問|discussion|company|会社|面談|対話|会話|interviewer/.test(t)) return 'relay';
+    return 'speak';
+  }
+
+  function renderCREBlocks() {
+    clearChildren(creContent);
+    if (creRendered.resolvedMode === 'relay') {
+      creContent.appendChild(buildHelperBlock('ack', '[接球]', creRendered.ack, function () {
+        creRendered.ack = pick(CBL.ack);
+        return creRendered.ack;
+      }));
+      creContent.appendChild(buildHelperBlock('ask', '[軽い反問]', creRendered.ask, function () {
+        creRendered.ask = pick(CBL.ask);
+        return creRendered.ask;
+      }));
+      creContent.appendChild(buildHelperBlock('expand', '[つなぎ]', creRendered.expand, function () {
+        creRendered.expand = pick(CBL.expand);
+        return creRendered.expand;
+      }));
+      return;
+    }
+    creContent.appendChild(buildHelperBlock('start', '[起手]', creRendered.start, function () {
+      creRendered.start = pick(CHEAT.start);
+      return creRendered.start;
+    }));
+    creContent.appendChild(buildHelperBlock('mid', '[中段]', creRendered.mid, function () {
+      creRendered.mid = pick(CHEAT.mid[creRendered.speakSubtype]);
+      return creRendered.mid;
+    }));
+    creContent.appendChild(buildHelperBlock('end', '[収束]', creRendered.end, function () {
+      creRendered.end = pick(CHEAT.end);
+      return creRendered.end;
+    }));
+  }
+
+  function refreshCreModeUI() {
+    if (!creModeAutoBtn || !creModeSpeakBtn || !creModeRelayBtn) return;
+    creModeAutoBtn.classList.toggle('active', creMode === 'auto');
+    creModeSpeakBtn.classList.toggle('active', creMode === 'speak');
+    creModeRelayBtn.classList.toggle('active', creMode === 'relay');
+  }
+
+  function generateCRE() {
+    const title = getActiveQuestionTitle();
+    const resolvedMode = creMode === 'auto' ? inferCREMode(title) : creMode;
+    if (resolvedMode === 'relay') {
+      creRendered = {
+        resolvedMode: 'relay',
+        speakSubtype: 'general',
+        start: '',
+        mid: '',
+        end: '',
+        ack: pick(CBL.ack),
+        ask: pick(CBL.ask),
+        expand: pick(CBL.expand)
+      };
+    } else {
+      const subtype = inferSpeakSubtype(title);
+      creRendered = {
+        resolvedMode: 'speak',
+        speakSubtype: subtype,
+        start: pick(CHEAT.start),
+        mid: pick(CHEAT.mid[subtype]),
+        end: pick(CHEAT.end),
+        ack: '',
+        ask: '',
+        expand: ''
+      };
+    }
+    renderCREBlocks();
+    refreshCreModeUI();
+  }
+
+  if (creBox && creContent && creGenerateBtn && creModeAutoBtn && creModeSpeakBtn && creModeRelayBtn) {
+    creModeAutoBtn.addEventListener('click', function () {
+      creMode = 'auto';
+      generateCRE();
+    });
+    creModeSpeakBtn.addEventListener('click', function () {
+      creMode = 'speak';
+      generateCRE();
+    });
+    creModeRelayBtn.addEventListener('click', function () {
+      creMode = 'relay';
+      generateCRE();
+    });
+    creGenerateBtn.addEventListener('click', function () {
+      generateCRE();
+    });
+
+    const prevOnActiveQuestionChanged = onActiveQuestionChanged;
+    onActiveQuestionChanged = function () {
+      if (typeof prevOnActiveQuestionChanged === 'function') prevOnActiveQuestionChanged();
+      if (creMode === 'auto') generateCRE();
+    };
+
+    generateCRE();
+  }
+
   document.body.addEventListener('click', function (ev) {
     if (!isMobileViewport()) return;
     const packDrawer = document.getElementById('pack-mobile-drawer');
@@ -1048,6 +1487,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
 
   renderPackPanel();
   renderMobilePackDrawer();
+  setupQuickNote();
   render();
   scrollQuestionToViewportTop(state.activeQIndex);
 

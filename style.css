@@ -1,4 +1,9 @@
 * { box-sizing: border-box; }
+:root {
+  --helper-stack-card-w: 200px;
+  /* 全 helper-card 共用：可捲動內容視窗與卡邊的安全距離（四邊一致） */
+  --helper-content-inset: 2px;
+}
 body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background: #fff; }
 .wrap { max-width: 36rem; margin: 0 auto; padding: 1rem; }
 .pack-label-row {
@@ -103,6 +108,176 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   transform: scale(1.08);
 }
 
+/* 桌面直向堆疊間距：--helper-stack-vstep 在 min-width 1024px 內與 #cce/#cre/#cbl 一併設定（預設 150px = 140px 卡高 + 10px 間隙） */
+.helper-card {
+  position: fixed;
+  width: var(--helper-stack-card-w);
+  height: 140px;
+  min-height: 140px;
+  max-height: 140px;
+  overflow: hidden;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.28;
+}
+
+.helper-card--narrow {
+  width: 184px;
+}
+
+.helper-controls-top {
+  position: absolute;
+  top: var(--helper-content-inset);
+  right: var(--helper-content-inset);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.helper-controls-top > * {
+  pointer-events: auto;
+}
+
+.helper-controls-bottom {
+  position: absolute;
+  right: var(--helper-content-inset);
+  bottom: var(--helper-content-inset);
+  z-index: 3;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.helper-controls-bottom > * {
+  pointer-events: auto;
+}
+
+.helper-controls-top button,
+.helper-controls-bottom button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.62;
+  font-size: 11px;
+  padding: 0;
+}
+
+.helper-controls-top button.active,
+.helper-controls-top button:hover,
+.helper-controls-bottom button:hover {
+  opacity: 1;
+}
+
+.helper-content {
+  position: absolute;
+  top: var(--helper-content-inset);
+  left: var(--helper-content-inset);
+  right: var(--helper-content-inset);
+  bottom: var(--helper-content-inset);
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  line-height: 1.28;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+}
+
+/* 區塊之間極小分隔；首尾不外加 margin，避免內文離捲動視窗上下緣變遠 */
+.helper-block {
+  margin: 0;
+  padding: 0;
+}
+
+.helper-block + .helper-block {
+  margin-top: 2px;
+}
+
+.helper-block-label {
+  margin: 0;
+  padding: 0;
+  line-height: 1.1;
+}
+
+.helper-block-text {
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.helper-block-text:hover,
+.helper-block-text.is-rerolling {
+  color: #ff0000;
+}
+
+#qn-box {
+  top: 28%;
+  left: max(14px, calc((100vw - 36rem) / 2 - 388px));
+  z-index: 9997;
+  border: 1px solid rgba(0, 165, 247, 0.34);
+  background: rgba(220, 245, 255, 0.72);
+  box-shadow: 0 0 0 1px rgba(0, 165, 247, 0.10) inset;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+#qn-clear {
+  color: rgba(0, 70, 110, 0.88);
+}
+
+#qn-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  color: rgba(10, 48, 72, 0.96);
+  font: 11px/1.28 ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+  letter-spacing: 0.01em;
+  vertical-align: top;
+}
+
+#qn-input::placeholder { color: rgba(0, 90, 140, 0.42); }
+
+#cce-box {
+  top: 16%;
+  z-index: 9997;
+  border: 1px solid rgba(255, 183, 0, 0.4);
+  background: rgba(255, 183, 0, 0.12);
+  box-shadow: 0 0 0 1px rgba(255, 183, 0, 0.12) inset;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+#cre-box {
+  top: calc(16% + var(--helper-stack-vstep, 150px));
+  z-index: 9997;
+  border: 1px solid rgba(120, 120, 145, 0.28);
+  background: rgba(245, 242, 250, 0.78);
+  box-shadow: 0 0 0 1px rgba(220, 215, 235, 0.16) inset;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+#cbl-box {
+  top: calc(16% + 2 * var(--helper-stack-vstep, 150px));
+  z-index: 9996;
+  border: 1px solid rgba(186, 150, 168, 0.32);
+  background: rgba(244, 236, 242, 0.58);
+  box-shadow: 0 0 0 1px rgba(210, 190, 205, 0.12) inset;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
 #pack-drawer-toggle {
   display: none;
 }
@@ -117,6 +292,55 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
 }
 
 @media (max-width: 1023px) {
+  #qn-box {
+    left: 14px;
+    top: auto;
+    bottom: 110px;
+    width: 156px;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+  }
+
+  #cce-box {
+    left: auto;
+    right: 12px;
+    top: auto;
+    bottom: 224px;
+    width: 176px;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    font-size: 11px;
+    z-index: 9996;
+  }
+
+  #cbl-box {
+    left: auto;
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    width: 176px;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    font-size: 11px;
+    z-index: 9995;
+  }
+
+  #cre-box {
+    left: auto;
+    right: 12px;
+    top: auto;
+    bottom: 118px;
+    width: 176px;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    font-size: 11px;
+    z-index: 9997;
+  }
+
   #pack-panel {
     display: none !important;
   }
@@ -359,11 +583,41 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
 
 /* desktop-only pack panel (薄層、低飽和粉系、直角細線；主內容為淺底，字色用深色以保可讀) */
 @media (min-width: 1024px) {
+  :root {
+    --pack-panel-fixed-right: 14px;
+    --pack-panel-fixed-width: 170px;
+    --helper-main-column-max: 36rem;
+    --helper-after-main-gap: 12px;
+    --helper-to-pack-gap: 12px;
+  }
+
+  /*
+   * 右側三張 helper（CCE / CRE / CBL）共用一條垂直堆疊：
+   * - 以與 .wrap 相同主欄寬上限（--helper-main-column-max）置中，貼在主欄右側
+   * - min(..., 100vw - pack - 間隙 - 卡寬) 與 #pack-panel 共用 --pack-panel-fixed-*
+   */
+  #cce-box,
+  #cre-box,
+  #cbl-box {
+    right: auto;
+    left: max(
+      14px,
+      min(
+        calc((100vw - var(--helper-main-column-max)) / 2 + var(--helper-main-column-max) + var(--helper-after-main-gap)),
+        calc(
+          100vw - var(--pack-panel-fixed-right) - var(--pack-panel-fixed-width) - var(--helper-to-pack-gap) -
+            var(--helper-stack-card-w)
+        )
+      )
+    );
+    --helper-stack-vstep: 150px;
+  }
+
   #pack-panel {
     position: fixed;
     top: 42px;
-    right: 14px;
-    width: 170px;
+    right: var(--pack-panel-fixed-right);
+    width: var(--pack-panel-fixed-width);
     max-height: 72vh;
     overflow-y: auto;
     z-index: 9998;
