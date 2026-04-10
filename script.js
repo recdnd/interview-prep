@@ -119,7 +119,7 @@ function showPackLoadError(message) {
     savedPinned = localStorage.getItem(PACK_PINNED_KEY) === "1";
     savedPackKey = localStorage.getItem(SELECTED_PACK_KEY) || "";
   } catch (_) {}
-  if (savedPinned && savedPackKey && !PACK_ORDER.includes(savedPackKey)) {
+  if (savedPinned && savedPackKey && !PACK_ORDER.includes(savedPackKey) && !isStandalonePackKey(savedPackKey)) {
     setPackPinState(null);
     savedPinned = false;
     savedPackKey = "";
@@ -130,7 +130,7 @@ function showPackLoadError(message) {
     currentPack = window.__INITIAL_PACK__;
   } else if (urlPack && (PACK_ORDER.includes(urlPack) || isStandalonePackKey(urlPack))) {
     currentPack = urlPack;
-  } else if (savedPinned && savedPackKey && PACK_ORDER.includes(savedPackKey)) {
+  } else if (savedPinned && savedPackKey && (PACK_ORDER.includes(savedPackKey) || isStandalonePackKey(savedPackKey))) {
     currentPack = savedPackKey;
   } else {
     currentPack = localStorage.getItem(LAST_PACK_KEY) || "jp-interview";
@@ -214,7 +214,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
 
   let panelSelectedPack = null;
   const pin = getPackPinState();
-  if (pin.pinned && pin.key && pin.key === currentPack && PACK_ORDER.includes(pin.key)) {
+  if (pin.pinned && pin.key && pin.key === currentPack && (PACK_ORDER.includes(pin.key) || isStandalonePackKey(pin.key))) {
     panelSelectedPack = pin.key;
   }
 
@@ -1019,7 +1019,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   packBtn.setAttribute('role', 'button');
   packBtn.setAttribute('tabindex', '0');
   document.body.appendChild(packBtn);
-  if (isStandalonePackKey(currentPack)) {
+  if (typeof window.__INITIAL_PACK__ === "string" && window.__INITIAL_PACK__ === currentPack) {
     packBtn.style.display = 'none';
   }
 

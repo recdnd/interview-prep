@@ -13,9 +13,8 @@ window.PACK_REGISTRY = {
     "en-work",
     "gaishi-special",
     "gaishi-drill",
-    "my-model",
-    "yt-ai-special",
-    "my-model-full"
+    "interview-cheatsheet",
+    "yt-ai-special"
   ],
   /** 左下角浮動切換鈕短標 */
   labels: {
@@ -25,8 +24,9 @@ window.PACK_REGISTRY = {
     "en-work": "EW",
     "gaishi-special": "GS",
     "gaishi-drill": "GD",
-    "my-model": "MM",
+    "interview-cheatsheet": "CSH",
     "yt-ai-special": "YT",
+    "my-model": "MM",
     "my-model-full": "MF",
     "jp-interview-legacy": "JL"
   },
@@ -38,16 +38,19 @@ window.PACK_REGISTRY = {
     "en-work": "EN Work",
     "gaishi-special": "GAISHI DLC",
     "gaishi-drill": "GAISHI DRILL",
-    "my-model": "MY MODEL",
+    "interview-cheatsheet": "快速小抄",
     "yt-ai-special": "YT AI Special",
-    "my-model-full": "My Model Full",
+    "my-model": "MY MODEL（母本・歸檔）",
+    "my-model-full": "My Model Full（母本・歸檔）",
     "jp-interview-legacy": "JP Interview (Legacy)"
   },
   /**
-   * 僅能透過 ?pack= 或 legacy/index.html 載入；不列入 order。
-   * 值為 true 表示啟用。
+   * 僅能透過 ?pack= 載入；不列入主選單。
+   * 用途：舊版錄音、長文母本等；仍可取材，但不參與日常輪播。
    */
   standalone: {
-    "jp-interview-legacy": true
+    "jp-interview-legacy": true,
+    "my-model": true,
+    "my-model-full": true
   }
 };

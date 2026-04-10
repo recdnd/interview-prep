@@ -1,0 +1,8 @@
+my-model / my-model-full（母本・歸檔）
+====================================
+- 已自主選單移除，改列於 packs/pack-registry.js 的 standalone。
+- 用途：底層主張／長回答母本；整理思路、寫 presentation 或長答時取材。
+- 仍可直接開啟：根目錄 index.html?pack=my-model 或 ?pack=my-model-full
+- 日常面試輪播請用主選單內的「快速小抄」interview-cheatsheet 等。
+
+成長線稿：packs/episodes.js（SKIP 於選單，需直接載入 packs/episodes.js 或之後若加入 registry）

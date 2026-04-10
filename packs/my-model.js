@@ -1,6 +1,6 @@
 window.PACK = {
   name: "my-model",
-  displayName: "MY MODEL",
+  displayName: "MY MODEL（母本・歸檔）",
   questions: [
     {
       id: 1,
