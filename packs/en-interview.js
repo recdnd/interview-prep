@@ -1,5 +1,6 @@
 window.PACK = {
   name: "en-interview",
+  displayName: "EN Interview",
   questions: [
     {
       id: 1,

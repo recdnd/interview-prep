@@ -8,8 +8,8 @@
 
 | 欄位 | 類型 | 說明 |
 |------|------|------|
-| `name` | string | Pack 識別名，對應檔名（例：`gaishi-special`）。**須在 `script.js` 的 `PACK_ORDER` / `PACK_LABEL` 註冊**後才會出現在切換選單。 |
-| `displayName` | string（選填） | 畫面頂部顯示的標籤；未填則用 `name`。部分既有 pack 未設，行為上仍正常。 |
+| `name` | string | Pack 識別名，對應檔名（例：`gaishi-special`）。**須在 `packs/pack-registry.js` 的 `order` / `labels` / `displayNames` 註冊**後才會出現在切換選單（見下「Pack registry」）。 |
+| `displayName` | string（建議） | 與 `pack-registry.js` 的 `displayNames` **一致**；選單與頂欄顯示名稱以此對齊。未設時須在 registry 單獨補 `displayNames`。 |
 | `questions` | array | 題目列表，順序即 App 中的預設順序（可搭配置頂等功能重排顯示）。 |
 
 ## `questions[]` 每一題
@@ -86,10 +86,17 @@
 - 檔案為 **JavaScript**，`variants` 內可用 **雙引號字串**或 **反引號 template literal**（多行、換行方便）。
 - 陣列最後一項後面**不要**多餘逗號（維持可執行、易 diff）。
 
+## Pack registry（`packs/pack-registry.js`）
+
+- **單一資料來源**：主站與 `legacy/` 子站選單皆讀取此檔的 `order`（順序）、`labels`（左下角短標）、`displayNames`（選單顯示名）、`standalone`（僅能 `?pack=` / legacy 進入之 pack）。
+- `index.html` / `legacy/index.html` 須在 `script.js` **之前**載入 `packs/pack-registry.js`。
+- 新增或更名 pack 後執行 **`npm run check-packs`**：會檢查 registry 與 `packs/*.js` 是否一一對應、`displayName` 與 registry 是否一致。
+- 非主選單用的工具／實驗稿（如 `fillings.js`）請維持在 `scripts/check-packs.mjs` 的 `SKIP_FILES`，不必加入 `order`。
+
 ## 與 `script.js` 的關係
 
-- 新增檔 `packs/<name>.js` 後，務必在 `PACK_ORDER` 加入 `<name>`，並在 `PACK_LABEL` 設定右下角短標籤（通常 2 字母）。
-- `PACK_ORDER` 列舉的每一項，應存在對應 `packs/<name>.js`，否則選單會載入失敗或走 fallback。
+- 新增檔 `packs/<name>.js` 後，務必在 **pack-registry** 的 `order`（或 `standalone`）加入 `<name>`，並設定 `labels` 與 `displayNames`。
+- `order` 列舉的每一項，應存在對應 `packs/<name>.js`，否則選單會載入失敗或走 fallback。
 
 ---
 
@@ -99,7 +106,7 @@
 
 | 項目 | 結果 |
 |------|------|
-| `PACK_ORDER` 與實際檔案 | 七個 pack 均有對應 `.js`，與 `script.js` 一致。 |
+| `pack-registry` 與實際檔案 | `order` / `standalone` 所列均有對應 `packs/*.js`；以 `npm run check-packs` 驗證。 |
 | 空 `variants` 或缺 `text` | 未發現。 |
 | **`variants` 型別寫在表內卻只有 `string[]`** | 舊版文件易誤導；**已於本版改為「字串或物件」**；`jp-interview` / `en-interview` 依賴物件形式。 |
 | **`role` 可見性** | `jp-interview` 大量使用 variant `role`；**UI 不顯示**，與「內部用」敘述一致。 |
@@ -112,7 +119,7 @@
 
 ## 撰寫／PR 前自查清單
 
-- [ ] 新 pack 已加入 `PACK_ORDER` / `PACK_LABEL`。
+- [ ] 新 pack 已加入 `packs/pack-registry.js`（`order` 或 `standalone`）並設定 `labels` / `displayNames`；已執行 `npm run check-packs`。
 - [ ] 每一題至少一個 variant；若為物件則 **`text` 非空**。
 - [ ] **整題回答型** pack：任一 variant 單獨唸出是否**無需其他 variant 補完**？
 - [ ] 多 variant 是否為 **平行說法 / 時長層級 / 語気完整版 / 已標題註明之插入句** 之一，而非 **What→Why→例** 輪播？

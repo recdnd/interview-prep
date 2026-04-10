@@ -1,8 +1,5 @@
 // pack loader + viewer
 
-/** 僅能透過 legacy/index.html 或 ?pack= 載入；不列入主選單 */
-const STANDALONE_PACK_NAMES = { "jp-interview-legacy": true };
-
 const SELECTED_PACK_KEY = "selectedPackKey";
 const PACK_PINNED_KEY = "packPinned";
 
@@ -74,6 +71,12 @@ function isValidPackPayload(p) {
   return !!(p && Array.isArray(p.questions) && p.questions.length > 0);
 }
 
+/** 與 packs/pack-registry.js 內 standalone 對齊 */
+function isStandalonePackKey(key) {
+  const r = typeof window !== "undefined" && window.PACK_REGISTRY;
+  return !!(r && r.standalone && r.standalone[key]);
+}
+
 function showPackLoadError(message) {
   const label = document.getElementById("pack-label");
   if (label) label.textContent = "載入失敗";
@@ -98,18 +101,13 @@ function showPackLoadError(message) {
 }
 
 (function () {
-  const PACK_ORDER = ["jp-interview", "cs-core", "en-interview", "en-work", "gaishi-special", "gaishi-drill", "my-model", "yt-ai-special", "my-model-full"];
-  const PACK_LABEL = {
-    "jp-interview": "JI",
-    "cs-core": "CS",
-    "en-interview": "EI",
-    "en-work": "EW",
-    "gaishi-special": "GS",
-    "gaishi-drill": "GD",
-    "my-model": "MM",
-    "yt-ai-special": "YT",
-    "my-model-full": "MF"
-  };
+  if (!window.PACK_REGISTRY || !Array.isArray(window.PACK_REGISTRY.order) || !window.PACK_REGISTRY.labels) {
+    showPackLoadError("缺少 packs/pack-registry.js 或格式不正確。請在 script.js 之前載入該檔。");
+    return;
+  }
+  const reg = window.PACK_REGISTRY;
+  const PACK_ORDER = reg.order;
+  const PACK_LABEL = reg.labels;
   const LAST_PACK_KEY = "pp_last_pack";
 
   const params = new URLSearchParams(location.search);
@@ -128,9 +126,9 @@ function showPackLoadError(message) {
   }
 
   let currentPack;
-  if (typeof window.__INITIAL_PACK__ === "string" && STANDALONE_PACK_NAMES[window.__INITIAL_PACK__]) {
+  if (typeof window.__INITIAL_PACK__ === "string" && isStandalonePackKey(window.__INITIAL_PACK__)) {
     currentPack = window.__INITIAL_PACK__;
-  } else if (urlPack && (PACK_ORDER.includes(urlPack) || STANDALONE_PACK_NAMES[urlPack])) {
+  } else if (urlPack && (PACK_ORDER.includes(urlPack) || isStandalonePackKey(urlPack))) {
     currentPack = urlPack;
   } else if (savedPinned && savedPackKey && PACK_ORDER.includes(savedPackKey)) {
     currentPack = savedPackKey;
@@ -138,7 +136,7 @@ function showPackLoadError(message) {
     currentPack = localStorage.getItem(LAST_PACK_KEY) || "jp-interview";
   }
 
-  if (!PACK_ORDER.includes(currentPack) && !STANDALONE_PACK_NAMES[currentPack]) {
+  if (!PACK_ORDER.includes(currentPack) && !isStandalonePackKey(currentPack)) {
     currentPack = "jp-interview";
   }
 
@@ -178,7 +176,7 @@ function showPackLoadError(message) {
   script.src = "packs/" + currentPack + ".js";
   script.onload = function () {
     if (isValidPackPayload(window.PACK)) {
-      if (!STANDALONE_PACK_NAMES[currentPack]) {
+      if (!isStandalonePackKey(currentPack)) {
         try {
           localStorage.setItem(LAST_PACK_KEY, window.PACK.name);
         } catch (_) {}
@@ -190,14 +188,14 @@ function showPackLoadError(message) {
       showPackLoadError("jp-interview 沒有有效的題目資料（questions）。");
       return;
     }
-    if (STANDALONE_PACK_NAMES[currentPack]) {
+    if (isStandalonePackKey(currentPack)) {
       showPackLoadError("無法載入 " + currentPack + " 題庫資料。");
       return;
     }
     injectJpFallback();
   };
   script.onerror = function () {
-    if (STANDALONE_PACK_NAMES[currentPack]) {
+    if (isStandalonePackKey(currentPack)) {
       showPackLoadError("無法載入 packs/" + currentPack + ".js。請確認本機 HTTP 伺服器與檔案路徑。");
       return;
     }
@@ -226,6 +224,10 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   }
 
   function formatPackListLabel(key) {
+    const r = typeof window !== "undefined" && window.PACK_REGISTRY;
+    if (r && r.displayNames && r.displayNames[key]) {
+      return r.displayNames[key];
+    }
     return key.replace(/-/g, " ").toUpperCase();
   }
 
@@ -830,7 +832,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
 
       const nameEl = document.createElement('span');
       nameEl.className = 'pack-item-name';
-      nameEl.textContent = key;
+      nameEl.textContent = formatPackListLabel(key);
 
       row.addEventListener('click', function () {
         if (panelSelectedPack === key) {
@@ -1017,7 +1019,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   packBtn.setAttribute('role', 'button');
   packBtn.setAttribute('tabindex', '0');
   document.body.appendChild(packBtn);
-  if (STANDALONE_PACK_NAMES[currentPack]) {
+  if (isStandalonePackKey(currentPack)) {
     packBtn.style.display = 'none';
   }
 

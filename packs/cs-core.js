@@ -1,5 +1,6 @@
 window.PACK = {
   name: "cs-core",
+  displayName: "CS Core",
   questions: [
     {
       id: 1,

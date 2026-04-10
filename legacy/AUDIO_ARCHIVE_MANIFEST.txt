@@ -23,3 +23,5 @@ q14/a2.m4a  →  q9/a2.m4a   同題 variant 2
 進入 legacy 子站：
   · /legacy/index.html
   · 或根目錄 index.html?pack=jp-interview-legacy
+
+Pack 選單與顯示名稱由根目錄 packs/pack-registry.js 統一維護；變更後請執行 npm run check-packs。

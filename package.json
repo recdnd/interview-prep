@@ -4,6 +4,7 @@
   "description": "Static site; npm start serves on localhost",
   "scripts": {
     "start": "python3 -m http.server 8787",
-    "localhost": "python3 -m http.server 8787"
+    "localhost": "python3 -m http.server 8787",
+    "check-packs": "node scripts/check-packs.mjs"
   }
 }
