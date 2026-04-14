@@ -286,6 +286,10 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   display: none;
 }
 
+#helper-visibility-toggle {
+  display: none;
+}
+
 /* mobile: 左下角按鈕上方超薄抽屜，僅 .is-open 顯示；右下角 ◿ 僅開關抽屜 */
 #pack-mobile-drawer {
   display: none;
@@ -483,6 +487,54 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
     opacity: 0.72;
   }
 
+  #helper-visibility-toggle {
+    display: block;
+    position: fixed;
+    right: 94px;
+    bottom: 18px;
+    z-index: 9999;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 17px;
+    line-height: 1;
+    color: #ff4000;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.92;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  #helper-visibility-toggle:hover {
+    opacity: 1;
+  }
+
+  #helper-visibility-toggle:active {
+    opacity: 0.76;
+  }
+
+  #helper-visibility-toggle.is-active {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  #qn-box,
+  #cce-box,
+  #cre-box,
+  #cbl-box {
+    display: block;
+  }
+
+  body.mobile-helpers-hidden #qn-box,
+  body.mobile-helpers-hidden #cce-box,
+  body.mobile-helpers-hidden #cre-box,
+  body.mobile-helpers-hidden #cbl-box {
+    display: none !important;
+  }
+
   #question-mobile-drawer {
     display: none;
   }
@@ -577,6 +629,10 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   }
 
   #question-drawer-toggle {
+    display: none !important;
+  }
+
+  #helper-visibility-toggle {
     display: none !important;
   }
 }

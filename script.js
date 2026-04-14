@@ -30,6 +30,7 @@ function setPackPinState(packKey) {
 const MOBILE_DRAWER_STATE_KEY = "mobileDrawerType";
 const PACK_DRAWER_OPEN_KEY = "packDrawerOpen";
 const QN_STORAGE_KEY = "pp_quick_note";
+const MOBILE_HELPERS_HIDDEN_KEY = "mobileHelpersHidden";
 
 function getMobileDrawerState() {
   try {
@@ -1043,6 +1044,40 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   questionDrawerToggle.setAttribute('aria-haspopup', 'true');
   document.body.appendChild(questionDrawerToggle);
 
+  const helperVisibilityToggle = document.createElement('button');
+  helperVisibilityToggle.id = 'helper-visibility-toggle';
+  helperVisibilityToggle.type = 'button';
+  helperVisibilityToggle.textContent = '\u2298';
+  helperVisibilityToggle.setAttribute('aria-label', '顯示或關閉 helper tools');
+  helperVisibilityToggle.setAttribute('aria-pressed', 'false');
+  document.body.appendChild(helperVisibilityToggle);
+
+  function getMobileHelpersHidden() {
+    try {
+      return localStorage.getItem(MOBILE_HELPERS_HIDDEN_KEY) === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function setMobileHelpersHidden(hidden) {
+    try {
+      if (hidden) {
+        localStorage.setItem(MOBILE_HELPERS_HIDDEN_KEY, "1");
+      } else {
+        localStorage.removeItem(MOBILE_HELPERS_HIDDEN_KEY);
+      }
+    } catch (_) {}
+  }
+
+  function applyMobileHelpersHidden(hidden) {
+    document.body.classList.toggle('mobile-helpers-hidden', hidden);
+    if (helperVisibilityToggle) {
+      helperVisibilityToggle.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+      helperVisibilityToggle.classList.toggle('is-active', hidden);
+    }
+  }
+
   // CCE: conversation continuation engine（固定浮層，無 prompt，一鍵續接）
   const cceBox = document.getElementById('cce-box');
   const cceContent = document.getElementById('cce-content');
@@ -1456,6 +1491,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     if (qDrawer && qDrawer.contains(ev.target)) return;
     if (drawerToggle.contains(ev.target)) return;
     if (questionDrawerToggle.contains(ev.target)) return;
+    if (helperVisibilityToggle.contains(ev.target)) return;
     closeAllMobileDrawers();
   });
 
@@ -1503,8 +1539,25 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     questionDrawerToggle.click();
   });
 
+  helperVisibilityToggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!isMobileViewport()) return;
+    const hidden = !document.body.classList.contains('mobile-helpers-hidden');
+    applyMobileHelpersHidden(hidden);
+    setMobileHelpersHidden(hidden);
+  });
+
+  helperVisibilityToggle.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    helperVisibilityToggle.click();
+  });
+
   window.addEventListener('resize', function () {
-    if (!isMobileViewport()) closeAllMobileDrawers();
+    if (!isMobileViewport()) {
+      closeAllMobileDrawers();
+    }
+    applyMobileHelpersHidden(getMobileHelpersHidden());
   });
 
   renderPackPanel();
@@ -1512,6 +1565,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   setupQuickNote();
   render();
   scrollQuestionToViewportTop(state.activeQIndex);
+  applyMobileHelpersHidden(getMobileHelpersHidden());
 
   if (isMobileViewport()) {
     const st = getMobileDrawerState();
