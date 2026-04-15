@@ -4,8 +4,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
+PROJECT_NAME="$(basename "$SCRIPT_DIR")"
 
-echo "📁 interview-prep：$SCRIPT_DIR"
+echo "📁 ${PROJECT_NAME}：$SCRIPT_DIR"
 
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
   echo "錯誤：此目錄不是 Git 儲存庫。" >&2
@@ -23,7 +24,7 @@ git add -A
 if git diff --cached --quiet; then
   echo "（暫無需提交的變更）"
 else
-  MSG="${1:-Update interview-prep}"
+  MSG="${1:-Update ${PROJECT_NAME}}"
   echo "💾 提交：$MSG"
   git commit -m "$MSG"
 fi
