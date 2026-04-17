@@ -1,4 +1,4 @@
-/** Loglass 面試用：5min intro / Spiral / 志望動機 */
+/** Loglass 面試用：5min intro / Spiral / 志望動機 / Spiral 後逆質問バリエーション */
 window.PACK = {
   name: "loglass",
   displayName: "Loglass",
@@ -8,72 +8,39 @@ window.PACK = {
       title: "5min intro + project presentation",
       emoji: "🪐",
       variants: [
-        `立教大学文学部史学科4年の、セツシュントウと申します。
-古代地中海史ゼミに所属していて、2027年9月に卒業予定です。
-出身は中国・上海です。
+        `よろしくお願いいたします。
+立教大学文学部史学科4年の、セツ・シュントウと申します。古代地中海史ゼミに所属しており、2027年9月卒業予定です。出身は中国・上海です。
 
-もともとはアメリカのバージニア工科大学に進学する予定だったのですが、コロナの影響で進路を見直すことになりました。そこで日本語を独学しながら新たに受験準備を進め、最終的に東京で進学し直しました。
+もともとはアメリカの大学に進学する予定だったのですが、コロナの影響で進路を見直し、日本で受験し直しました。高校時代には、ロボットの図面制作を中心に取り組んでいました。もともと、複雑な構造を考えたり整理したりすることへの関心が強く、その延長で今の開発志向につながっています。
 
-エンジニアを志したきっかけは、大学で制度史を学ぶ中で、履歴や制度のような「複雑な構造」そのものに強く関心を持つようになったことです。
-そうした構造が、時間の中でどう変化して、なおかつ人にどう理解されるのかを考えるうちに、その関心が自然とソフトウェア設計やシステム設計にもつながっていきました。
-その後、複雑なものを構造化して、人に分かる形で扱えるようにすることに、だんだん興味を持つようになりました。
+次に、スキルについてです。
+自分はラピッドプロトタイピングを軸に、個人でフルスタックのプロダクト開発をしてきました。技術スタックはスライドの通りですが、普段は自然言語と複数のAIを併用しながら開発を進めており、自分は主に全体設計、モジュール分割、呼び出し設計、バグ分析を含む構造整理を担当しています。
 
-次のページですが、開発経験は3年以上あります。
-フルスタックの個人開発を中心に、抽象度の高いシステム設計や、プロトタイプの設計・実装、動的・静的なWebサービスの運営などに取り組んできました。
-そのほかにも、Pythonによる自動化、GUIツール、小規模ツールの設計など、幅広く触ってきました。
-また、実験的な取り組みとして、Custom DSLの設計や命令系の設計にも取り組んできました。
-たとえば、AIワークフロー向けの制御構文設計、権限モデル設計、ドキュメント駆動型のシステム設計なども、自分で構想しながら進めてきました。
-その中でも特に、開発環境の最適化やAI連携、意味解析や簡易パーサーの設計、そしてUX/UI設計から実装までを一貫して行ってきました。
+また、実装だけでなく、権限制御やドキュメント構造についてもプロトタイプを試作してきました。まず形にして、短いサイクルで改善を回す進め方をよく取っています。特に、インターフェース設計やツールチェーン設計が好きです。制度史を研究してきたこともあり、システムについても、できるだけ説明可能であることを意識しています。
 
-主な技術スタックはこちらになります。
+今後は、改善や効率向上につながる課題に対して、企画から設計、実装まで一貫して関われるビルダーになりたいと考えています。特に、AIワークフロー設計、要件定義、開発プロセス改善、業務改善につながる社内ツールの提案・設計・実装に関心があります。
+自分の強みは、複雑な課題を整理して、全体像を踏まえながら、実際に使える形まで落とし込むところにあると思っています。そのため、プロダクトの目的やユーザー価値、業務全体の流れまで含めて考えられる環境で働きたいと考えています。
 
-……では、次のページに移ります。
-今後は、改善や効率向上につながる課題を見つけて、企画から設計、実装まで一貫して関われるビルダーになりたいと考えています。
-特に、AIワークフロー設計や要件定義、開発プロセス改善、あるいは業務改善につながる社内ツールの提案や設計・実装に関心があります。
-自分は、与えられた機能をそのまま作るというより、課題を見つけて、全体像を踏まえて整理し、実際に使いやすい形に落としていくところに一番強みがあると思っています。
-なので、フロントエンド・バックエンド・設計を細かく分断せずに、プロダクトの目的やユーザー価値、業務全体の流れまで含めて考えられる環境で働きたいです。
-複雑な課題を構造化して、プロダクトとして価値に変えていけるようになりたいと思っています。
+では、メインプロジェクトである Spiral についてご紹介いたします。
+概要は左側にまとめておりますので、ご興味がありましたらぜひご覧ください。このプロジェクトは英語ベースで進めてきたため、ここからは英語で簡単にご説明します。
 
-では早速、私のメーンプロジェクトであるSpiralについて、ご紹介したいと思います。
-プロジェクトの概要は左側にまとめておりますので、もしご興味を持っていただけましたら、ぜひ後ほどアクセスしてご覧いただければと思います。
-このプロジェクトは、開発や設計の多くを英語ベースで進めてきたものですので、ここからは英語でご説明いたします。
+Spiral is a system for handling conversation and document structure on top of history. It is both a full-stack product and a research prototype, and I worked on it as the sole architect and developer. One major implementation point was the design of an append-only event history. I wanted the system to preserve operations and transitions as history, rather than constantly overwriting state. Another point was causal relationship management using an event DAG, which allowed me to derive recent context from event structure itself.
 
-Let me introduce Spiral, which is my main project.
-Spiral is a system for handling conversation and document structure on top of history.
-It is both a full-stack product and a research prototype, and in this project I worked as the founder, architect, and developer.
+I also designed an interaction model that combines natural language and DSL, so users can both talk to the system and operate it in a structured way. At a higher level, I designed the overall system model, including the RWX-based permission model and the workspace structure that unifies documents, conversations, and actions. My main design goal was to keep the internal system complex, while making the external experience feel simple. So I separated browsing, editing, and execution clearly, and also separated AI responsibilities from ordinary backend logic. As a result, the system is internally complex, but externally organized to feel as natural and understandable as possible. This project is still evolving, but it is the one that best represents how I think about system design.
 
-From the technical implementation side, one major point was the design of an append-only event history.
-I wanted the system to preserve operations and transitions as history, rather than treating state as something opaque or constantly overwritten.
+今の説明は少し抽象的だったので、最後に、実際に何が変わるのかをシンプルにご説明します。
+従来のシステムでは、ユーザー操作のあとに何が起きたのかが見えにくく、ログも分散しやすいため、原因の追跡が難しいことが多いと思います。
+一方で、このシステムでは、すべての操作が fragment として記録され、履歴としてつながっていくため、どのように状態が変化したのかを追跡しやすくなります。すごくシンプルに言うと、ログではなく、「履歴そのものが構造になっている」イメージです。
 
-Another implementation point was causal relationship management using an event DAG.
-This allowed me to derive meaningful recent context from the structure of events themselves.
+そのため、設計としては主に三つのことを意識しています。
+一つ目は、traceable であること。
+二つ目は、状態遷移が説明可能であること。
+三つ目は、AIとのやり取りが安定することです。
 
-I also designed an interaction model that combines natural language and DSL, and I integrated conversational UX with structural manipulation.
-This was important because I wanted users not only to talk to the system, but also to operate it in a way that remains structured and explainable.
+その結果として、デバッグや原因特定がしやすくなり、チーム内での理解もそろえやすくなりますし、複雑なワークフローでも曖昧さを減らせると考えています。つまり、複雑なシステムを、観測できて、コントロールできる状態にすることが狙いです。
 
-At the higher design level, I worked on defining the system model of Spiral itself.
-That included the RWX-based permission and operation model, the unification of documents, conversations, and actions inside a single workspace, and the product design that consistently treats modules, permissions, and identity as one connected system.
-
-So, in summary, Spiral was an attempt to unify complex concepts and system structures into one interface that is easier to use and easier to understand.
-More than a single prototype, Spiral was also a way for me to think through how interaction, structure, and system history can be designed as one coherent product.
-
-Spiral is a system for handling dialogue and document structure on top of event history.
-When I designed it, I did not start from implementation details first.
-I started by organizing the requirements: how to keep the internal structure complex, while making the interaction feel simple from the outside.
-
-Then I separated the experience into a Desktop layer and a Fragment Editor layer, so browsing, editing, and execution would not collapse into one confusing screen.
-After that, I designed the permission model by separating Read, Write, and Execute, so the boundary between visibility and action would stay clear. The model was inspired by the Linux permission system, but adapted to an interactive product context.
-Then I structured the metadata layer for document types and module definitions, so the system could decide how to display and execute different objects consistently.
-
-I also separated AI responsibilities from normal backend logic.
-Interpretation and completion are handled by AI, while permission checks and state updates remain in ordinary logic.
-
-Finally, I integrated all of that into a workspace that looks simple from the outside, even though the internal system is quite complex.
-
-以上がSpiralの概要です。
-内部はかなり複雑なんですが、外からはなるべく自然に触れるように整理した、というのが一番大きい考え方でした。
-まだ発展途中ではありますが、自分の設計の考え方が一番よく出ているプロジェクトだと思っています。
-もしどこか気になるところがあれば、日本語でも補足します。`
+最後に、Spiral を短時間で見ていただける入口として、spiral.ooo/peek を用意しています。また、このスライド自体も下のリンクから閲覧・ダウンロードできます。必要に応じた範囲でご覧・ご共有いただけますと幸いです。
+以上です。ありがとうございました。`
       ]
     },
     {
@@ -421,6 +388,54 @@ Finally, I integrated all of that into a workspace that looks simple from the ou
       emoji: "🫧",
       variants: [
         `どの職種が近いかを今すぐ判断したいというより、まずは御社の事業や組織の動き方をちゃんと理解したい気持ちが強いです。その前提で、一点だけ伺ってもよろしいでしょうか。`
+      ]
+    },
+    {
+      id: 44,
+      title: "講完 Spiral → 逆質問（安定・先関心軸）",
+      emoji: "✨",
+      variants: [
+        `Spiral では、複雑な内部構造を持ちながらも、外から見たときにはできるだけ自然で理解しやすい体験にする、というところをかなり意識していました。
+その中で、自分としては「構造としてきれいであること」と「実際の運用に耐えること」の間にある張力にずっと関心があって。
+なので、ログラスさんのように複雑な業務文脈を扱うプロダクトでは、そのあたりを実際にどう設計判断されているのかがすごく気になっています。`
+      ]
+    },
+    {
+      id: 45,
+      title: "講完 Spiral → 逆質問（標準化 vs 顧客文脈）",
+      emoji: "⚖️",
+      variants: [
+        `Spiral を作る中でも、内部の整合性を保ちながら、外側ではできるだけシンプルに扱えるようにする、という点はかなり難しかったです。
+それって少し抽象化して言うと、設計としての標準化と、実際の使われ方や文脈への適応のバランスの話でもあると思っていて。
+その意味で、ログラスさんでは、プロダクトの標準化と顧客ごとの業務文脈の両立の中で、今どのあたりが一番難しいのかを少し伺ってみたいです。`
+      ]
+    },
+    {
+      id: 46,
+      title: "講完 Spiral → 逆質問（エンジニア寄り）",
+      emoji: "🛠️",
+      variants: [
+        `自分のプロジェクトでも、内部の状態や履歴はかなり複雑なんですが、それをそのままユーザーに見せるのではなく、理解しやすい操作や境界に落とし直すことを意識していました。
+こういう「内部の複雑さ」と「外側の使いやすさ」の間をどうつなぐかにはずっと関心があって、
+ログラスさんでも、複雑な業務要件をどのように整理してプロダクトに落としているのか、実際の感覚を伺ってみたいです。`
+      ]
+    },
+    {
+      id: 47,
+      title: "講完 Spiral → 逆質問（一句転場）",
+      emoji: "⚡",
+      variants: [
+        `自分でも似たように「複雑な構造をどう外側で自然に扱える形にするか」を考えていたので、ログラスさんでその判断が一番難しいポイントはどこなのか、すごく気になります。`
+      ]
+    },
+    {
+      id: 48,
+      title: "講完 Spiral → 逆質問（PPT 連接フル）",
+      emoji: "🪐",
+      variants: [
+        `このプロジェクトを通して、自分の中では、複雑な構造をそのまま放置するのではなく、観測できて、説明できて、使える形に整理することに強い関心があると改めて感じました。
+なので、ログラスさんのように、実際の業務や意思決定の複雑さを扱うプロダクトでは、そうした構造化や設計判断がどのように行われているのかがとても気になっています。
+特に、標準化されたプロダクトでありながら、顧客ごとの業務文脈にも向き合う中で、今いちばん難しいのはどのあたりなのか、少し伺ってみたいです。`
       ]
     }
   ]

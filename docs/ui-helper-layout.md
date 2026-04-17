@@ -46,7 +46,7 @@ Three-part cards are built from **block-level DOM**, not one plain string:
 - `.helper-block-label` (bracket label, not the click target)
 - `.helper-block-text` (click target)
 
-**JS state** holds the current line per part (`cceRendered`, `cblRendered`, `creRendered` in `script.js`). Full generate (⟳ / mode buttons) repicks all parts and re-renders. **Click on `.helper-block-text`** updates only that part’s string in state and in the DOM; other blocks stay unchanged.
+**JS state** holds the current line per part (`cceRendered`, `cblRendered` including AFF `aff` + `affResolvedKey`, `creRendered` in `script.js`). Full generate (⟳ / mode buttons) repicks all parts and re-renders. **Click on `.helper-block-text`** updates only that part’s string in state and in the DOM; other blocks stay unchanged.
 
 **CRE:** In speak mode, partial reroll uses `CHEAT` pools like CCE; in relay mode, uses `CBL` pools. Resolved mode is stored on `creRendered.resolvedMode`; mid-line pool key is `speakSubtype` when in speak mode.
 

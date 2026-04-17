@@ -14,11 +14,12 @@ Instead, it provides short conversational units that:
 
 ## Output structure
 
-Each generation produces three short lines:
+Each generation produces four short lines (see also **AFF** in `helpers-spec.md`):
 
 1. acknowledgment
-2. light follow-up question
-3. continuation / buffer
+2. micro-affirmation (AFF: flow / structure / reality / clarity)
+3. light follow-up question
+4. continuation / buffer
 
 These are designed to be immediately usable in spoken conversation.
 

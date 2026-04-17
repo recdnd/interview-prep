@@ -1089,6 +1089,8 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
 
   const CHEAT = {
     start: [
+      '今のご質問でいうと…',
+      '少しずれるかもしれないのですが、関連する話として…',
       'そうですね、少し整理しながらお話しすると…',
       '一言で言うのは難しいんですが…',
       '実際に触ってみると感じるのは…',
@@ -1098,6 +1100,8 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     ],
     mid: {
       general: [
+        '自分でも似たような問題を扱っていて…',
+        '実は自分のプロジェクトでも、少し近いテーマがあって…',
         '自分はまず理解しやすさを優先しています。',
         '完全な最適解というより、扱いやすさとのバランスで考えています。',
         'このあたりは実装して初めて見えてくる部分も多くて…',
@@ -1279,10 +1283,15 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     generateCCE();
   }
 
-  // CBL: catch ball layer（接球 + 輕反問 + つなぎ）
+  // CBL: catch ball layer（接球 + AFF 微肯定 + 輕反問 + つなぎ）
   const cblBox = document.getElementById('cbl-box');
   const cblContent = document.getElementById('cbl-content');
   const cblGenerateBtn = document.getElementById('cbl-generate');
+  const cblAffModeAutoBtn = document.getElementById('cbl-aff-mode-auto');
+  const cblAffModeProcessBtn = document.getElementById('cbl-aff-mode-process');
+  const cblAffModeStructureBtn = document.getElementById('cbl-aff-mode-structure');
+  const cblAffModeRealityBtn = document.getElementById('cbl-aff-mode-reality');
+  const cblAffModeClarityBtn = document.getElementById('cbl-aff-mode-clarity');
 
   const CBL = {
     ack: [
@@ -1306,6 +1315,10 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       '実際にはどの程度まで抽象化されているのでしょうか。'
     ],
     expand: [
+      '今のご質問でいうと…',
+      '少しずれるかもしれないのですが、関連する話として…',
+      '自分でも似たような問題を扱っていて…',
+      '実は自分のプロジェクトでも、少し近いテーマがあって…',
       '自分もそのあたりはもう少し理解を深めたいと思っていて…',
       'まだ完全に整理できているわけではないのですが…',
       '実際に触れてみないと分からない部分も多いと感じています。',
@@ -1317,13 +1330,94 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     ]
   };
 
-  let cblRendered = { ack: '', ask: '', expand: '' };
+  /** AFF (Micro Affirmation Layer): 微肯定。接 CBL.ack 後、CBL.expand 接回自己。 */
+  const AFF = {
+    process: [
+      'その流れ、かなり自然ですね。',
+      '進め方がすごく分かりやすいですね。',
+      '整理の仕方がきれいですね。',
+      '話の運び方に一貫性がありますね。',
+      'その進め方だと確かに理解しやすいですね。',
+      '考え方の流れがすっと入ってきました。',
+      '順番の置き方がすごくいいですね。',
+      'そこまでの持っていき方が自然ですね。',
+      '組み立て方に無理がなくていいですね。',
+      'その流れだと納得しやすいですね。'
+    ],
+    structure: [
+      'その分け方、かなりきれいですね。',
+      '構造としてすごく整理されていますね。',
+      'そこを分けて考えているのがいいですね。',
+      '切り方に納得感があります。',
+      'バランスの取り方がすごくいいですね。',
+      '見方がかなり整理されている印象があります。',
+      'その捉え方、構造的でいいですね。',
+      '整理の軸がはっきりしていて分かりやすいです。',
+      'その切り口、かなりしっくりきます。',
+      '複雑さの扱い方がうまいですね。'
+    ],
+    reality: [
+      'ちゃんと現実の使い方を前提にしている感じがいいですね。',
+      '実際の運用まで意識されているのがいいですね。',
+      'かなり地に足がついていますね。',
+      '実務に落ちやすそうなのがいいですね。',
+      '現場感がちゃんとありますね。',
+      '机上で終わっていない感じがいいですね。',
+      '実際に使う場面が見えているのがいいですね。',
+      '運用のことまで見えている印象があります。',
+      'ちゃんと現実の制約を踏まえているのがいいですね。',
+      '使われ方まで含めて考えられているのがいいですね。'
+    ],
+    clarity: [
+      '説明がすごくクリアですね。',
+      'ポイントがかなり分かりやすいです。',
+      'イメージしやすかったです。',
+      'どういうことかすぐ伝わりました。',
+      '抽象的だけど分かりやすいですね。',
+      '言いたいことがすっと入ってきますね。',
+      'かなり見えやすい説明ですね。',
+      '整理されていて受け取りやすいです。',
+      '話の焦点がはっきりしていていいですね。',
+      '説明の解像度がちょうどいいですね。'
+    ]
+  };
+
+  function inferAffPoolKey(title) {
+    const t = String(title || '').toLowerCase();
+    if (/構造|構築|境界|モジュール|設計|architecture|append|state|dag|権限|整合/.test(t)) return 'structure';
+    if (/運用|現場|業務|実務|顧客|saas|要件|プロダクト|経営/.test(t)) return 'reality';
+    if (/説明|クリア|伝わ|イメージ|抽象/.test(t)) return 'clarity';
+    if (/流れ|進め|プロセス|フロー|話|対話/.test(t)) return 'process';
+    const keys = ['process', 'structure', 'reality', 'clarity'];
+    return keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  function resolveAffPoolKey() {
+    if (cblAffManualMode !== null) return cblAffManualMode;
+    return inferAffPoolKey(getActiveQuestionTitle());
+  }
+
+  let cblAffManualMode = null; // null = auto, else process|structure|reality|clarity
+  let cblRendered = { ack: '', aff: '', affResolvedKey: 'process', ask: '', expand: '' };
+
+  function refreshCblAffModeUI(resolvedKey) {
+    if (!cblAffModeAutoBtn) return;
+    cblAffModeAutoBtn.classList.toggle('active', cblAffManualMode === null);
+    cblAffModeProcessBtn.classList.toggle('active', resolvedKey === 'process');
+    cblAffModeStructureBtn.classList.toggle('active', resolvedKey === 'structure');
+    cblAffModeRealityBtn.classList.toggle('active', resolvedKey === 'reality');
+    cblAffModeClarityBtn.classList.toggle('active', resolvedKey === 'clarity');
+  }
 
   function renderCBLBlocks() {
     clearChildren(cblContent);
     cblContent.appendChild(buildHelperBlock('ack', '[接球]', cblRendered.ack, function () {
       cblRendered.ack = pick(CBL.ack);
       return cblRendered.ack;
+    }));
+    cblContent.appendChild(buildHelperBlock('aff', '[微肯定]', cblRendered.aff, function () {
+      cblRendered.aff = pick(AFF[cblRendered.affResolvedKey]);
+      return cblRendered.aff;
     }));
     cblContent.appendChild(buildHelperBlock('ask', '[軽い反問]', cblRendered.ask, function () {
       cblRendered.ask = pick(CBL.ask);
@@ -1336,19 +1430,55 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
   }
 
   function generateCBL() {
+    const affKey = resolveAffPoolKey();
     cblRendered = {
       ack: pick(CBL.ack),
+      affResolvedKey: affKey,
+      aff: pick(AFF[affKey]),
       ask: pick(CBL.ask),
       expand: pick(CBL.expand)
     };
     renderCBLBlocks();
+    refreshCblAffModeUI(affKey);
   }
 
-  if (cblBox && cblContent && cblGenerateBtn) {
+  if (cblBox && cblContent && cblGenerateBtn && cblAffModeAutoBtn && cblAffModeProcessBtn && cblAffModeStructureBtn && cblAffModeRealityBtn && cblAffModeClarityBtn) {
     cblGenerateBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       generateCBL();
     });
+    cblAffModeAutoBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cblAffManualMode = null;
+      generateCBL();
+    });
+    cblAffModeProcessBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cblAffManualMode = 'process';
+      generateCBL();
+    });
+    cblAffModeStructureBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cblAffManualMode = 'structure';
+      generateCBL();
+    });
+    cblAffModeRealityBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cblAffManualMode = 'reality';
+      generateCBL();
+    });
+    cblAffModeClarityBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cblAffManualMode = 'clarity';
+      generateCBL();
+    });
+
+    const prevOnActiveQuestionChangedForCBL = onActiveQuestionChanged;
+    onActiveQuestionChanged = function () {
+      if (typeof prevOnActiveQuestionChangedForCBL === 'function') prevOnActiveQuestionChangedForCBL();
+      if (cblAffManualMode === null) generateCBL();
+    };
+
     generateCBL();
   }
 
@@ -1368,6 +1498,8 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     mid: '',
     end: '',
     ack: '',
+    aff: '',
+    affResolvedKey: 'process',
     ask: '',
     expand: ''
   };
@@ -1391,6 +1523,10 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
       creContent.appendChild(buildHelperBlock('ack', '[接球]', creRendered.ack, function () {
         creRendered.ack = pick(CBL.ack);
         return creRendered.ack;
+      }));
+      creContent.appendChild(buildHelperBlock('aff', '[微肯定]', creRendered.aff, function () {
+        creRendered.aff = pick(AFF[creRendered.affResolvedKey]);
+        return creRendered.aff;
       }));
       creContent.appendChild(buildHelperBlock('ask', '[軽い反問]', creRendered.ask, function () {
         creRendered.ask = pick(CBL.ask);
@@ -1427,6 +1563,7 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     const title = getActiveQuestionTitle();
     const resolvedMode = creMode === 'auto' ? inferCREMode(title) : creMode;
     if (resolvedMode === 'relay') {
+      const affKey = inferAffPoolKey(title);
       creRendered = {
         resolvedMode: 'relay',
         speakSubtype: 'general',
@@ -1434,6 +1571,8 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
         mid: '',
         end: '',
         ack: pick(CBL.ack),
+        affResolvedKey: affKey,
+        aff: pick(AFF[affKey]),
         ask: pick(CBL.ask),
         expand: pick(CBL.expand)
       };
@@ -1446,6 +1585,8 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
         mid: pick(CHEAT.mid[subtype]),
         end: pick(CHEAT.end),
         ack: '',
+        affResolvedKey: 'process',
+        aff: '',
         ask: '',
         expand: ''
       };
