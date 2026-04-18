@@ -24,7 +24,7 @@
 ## AFF（Micro Affirmation Layer）
 
 - **目的**：降壓、好聊感；用**觀察到的具體點**（流れ／構造／現実／明瞭さ）微肯定，**不**以空泛誇獎結尾。
-- **池**：`AFF.process` / `AFF.structure` / `AFF.reality` / `AFF.clarity`（實作於 `script.js` 之 `AFF`）。
+- **池**：`AFF.process` / `AFF.structure` / `AFF.reality` / `AFF.clarity`（語料於 `helpers/helper-corpus.js` 之 `HELPER_CORPUS.aff`；`script.js` 負責抽選與 UI）。
 - **使用規則**：語意上應接 **`CBL.expand`**（つなぎ），勿單句 AFF 就結束；避免連發多句 AFF。
 - **CBL 頂部按鈕**：`A`＝依當前題目標題自動推斷池；`流` `構` `現` `明`＝手動固定池（手動優先，直到再按 `A`）。
 
@@ -70,18 +70,23 @@
 
 ---
 
-## 實作位置（`script.js`）
+## 語料與邏輯位置
 
-| 資料結構 | 說明 |
-|----------|------|
-| `CHEAT` | CCE 與 CRE-speak 的 `start`、`mid.{general,ux,system}`、`end` |
-| `AFF` | `process` / `structure` / `reality` / `clarity`；CBL 與 CRE-relay 的 `[微肯定]` |
-| `CBL` | `ack`、`ask`、`expand`（接球／反問／つなぎ） |
+| 項目 | 說明 |
+|------|------|
+| **`helpers/helper-corpus.js`** | `window.HELPER_CORPUS`：`cheat`（CCE／CRE-speak）、`cbl`、`aff`。須在 `script.js` **之前**載入。 |
+| **`script.js`** | 讀取 `HELPER_CORPUS` 為 `CHEAT` / `CBL` / `AFF`；`pick`、`buildHelperBlock`、模式推斷、渲染與事件綁定。 |
+
+| 資料結構（語料鍵） | 說明 |
+|--------------------|------|
+| `HELPER_CORPUS.cheat`（執行時別名 `CHEAT`） | CCE 與 CRE-speak 的 `start`、`mid.{general,ux,system}`、`end` |
+| `HELPER_CORPUS.aff`（`AFF`） | `process` / `structure` / `reality` / `clarity`；CBL 與 CRE-relay 的 `[微肯定]` |
+| `HELPER_CORPUS.cbl`（`CBL`） | `ack`、`ask`、`expand`（接球／反問／つなぎ） |
 | CCE UI | `cce-*` 元素、`inferCCEModeFromQuestionTitle`、`renderCceBlocks` 等 |
 | CBL UI | `cbl-*` 含 `cbl-modes`（AFF 池）、`inferAffPoolKey`、`generateCBL`、`renderCBLBlocks` |
 | CRE UI | `cre-*` 元素、`inferCREMode`、`inferSpeakSubtype`、`renderCREBlocks`；relay 分支內對 `CBL.*` 呼叫 `pick` |
 
-修改文案時：**對照上表** 改對應物件，避免只改一處卻以為 CRE 已更新。
+修改短句文案時：改 **`helpers/helper-corpus.js`** 對應鍵；避免只改 `script.js` 卻以為 CRE 已更新。
 
 ---
 

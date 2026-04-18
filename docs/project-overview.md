@@ -79,7 +79,7 @@ helper 行為與按鈕語意：**[helpers-spec.md](./helpers-spec.md)**（合併
 | 文件 | 用途 |
 |------|------|
 | [PACK_FORMAT.md](./PACK_FORMAT.md) | `window.PACK` 欄位、`variants` 寫法約定 |
-| [hard-work-placeholder-notes.md](./hard-work-placeholder-notes.md) | `hard-work` pack の `[xx]` プレースホルダ規約と Cursor 用短文 |
+| [hard-work-placeholder-notes.md](./hard-work-placeholder-notes.md) | `smart-full-lines` 内 `〔hard-work〕` の `[xx]` プレースホルダ規約と Cursor 用短文 |
 | [packs-overview.md](./packs-overview.md) | 各 pack 一句話用途＋standalone／未登錄檔案表 |
 | [david-pich-routing.md](./david-pich-routing.md) | David Pich 面談整場路由（對齊 `david-pich.js` 題 id） |
 | [ruvia-demo-routing.md](./ruvia-demo-routing.md) | Ruvia 約 3 分鐘 demo：trigger、分鐘腳本、結束後接話與 cross-pack |

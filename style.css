@@ -196,6 +196,19 @@ body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: #111; background:
   margin-top: 2px;
 }
 
+/* 頂列 A/S/R 等が overlay のため、scrollTop=0 だと第一段ラベルが隠れ「空に見える」→ 先頭ブロックだけ極小下げ */
+#cce-content > .helper-block:first-child,
+#cre-content > .helper-block:first-child,
+#cbl-content > .helper-block:first-child {
+  margin-top: 13px;
+}
+
+#cce-box .helper-block-text,
+#cre-box .helper-block-text,
+#cbl-box .helper-block-text {
+  color: rgba(22, 18, 30, 0.94);
+}
+
 .helper-block-label {
   margin: 0;
   padding: 0;

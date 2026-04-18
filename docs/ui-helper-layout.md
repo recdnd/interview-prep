@@ -42,7 +42,7 @@ Each helper uses the same internal geometry:
 
 Three-part cards are built from **block-level DOM**, not one plain string:
 
-- `.helper-block` with optional `data-part` (`start` | `mid` | `end` | `ack` | `ask` | `expand`) — **no outer margin/padding** on the block itself except a small **`2px`** gap between consecutive blocks (`+ .helper-block`), so text can align with the content viewport edges.
+- `.helper-block` with optional `data-part` (`start` | `mid` | `end` | `ack` | `ask` | `expand`) — **no outer margin/padding** on the block itself except a small **`2px`** gap between consecutive blocks (`+ .helper-block`), so text can align with the content viewport edges. **例外：** `#cce-content` / `#cre-content` / `#cbl-content` の**先頭** `.helper-block` だけ `margin-top: 13px`（`style.css`）— 頂列モードボタン overlay の下に第一段が隠れ「空カード」に見えるのを防ぐ。
 - `.helper-block-label` (bracket label, not the click target)
 - `.helper-block-text` (click target)
 

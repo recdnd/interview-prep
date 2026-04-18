@@ -15,7 +15,7 @@ fi
 
 BRANCH="$(git branch --show-current)"
 REMOTE="${GIT_REMOTE:-origin}"
-PORT="${PORT:-8000}"
+PORT="${PORT:-8001}"
 
 echo "🔄 分支：$BRANCH → 遠端：$REMOTE"
 

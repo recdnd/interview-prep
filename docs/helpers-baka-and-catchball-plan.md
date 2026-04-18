@@ -52,7 +52,7 @@
 1. `coding-edge`
 2. `coding-test`
 3. `coding-test-loglass`
-4. `coding-test-loglass-lite`
+4. `coding-test-loglass`（含原 lite 極短題，`〔極短〕` 接頭）
 5. `product-engineer-cheatsheet`
 6. `ml-research-pack`
 

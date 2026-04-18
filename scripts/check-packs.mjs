@@ -29,8 +29,12 @@ function loadRegistry() {
 
 function extractPackMeta(filePath) {
   const src = readFileSync(filePath, "utf8");
-  const nameM = src.match(/\bname:\s*"([^"]+)"/);
-  const dnM = src.match(/\bdisplayName:\s*"([^"]*)"/);
+  const nameM =
+    src.match(/\bname:\s*"([^"]+)"/) ||
+    src.match(/"name"\s*:\s*"([^"]+)"/);
+  const dnM =
+    src.match(/\bdisplayName:\s*"([^"]*)"/) ||
+    src.match(/"displayName"\s*:\s*"([^"]*)"/);
   return {
     name: nameM ? nameM[1] : null,
     displayName: dnM ? dnM[1] : null
