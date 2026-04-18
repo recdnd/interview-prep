@@ -15,7 +15,7 @@
 | `technical-ball` | TB | technical-ball | 日語技術／カジュアル面談用「接球」長庫：Spiral／Fragment／append-only／DSL、AI 分工、全端、誤解回應、公司動機等。 |
 | `shokunin-pack` | SK | shokunin pack | 職人氣質與工作態度短句（中日混標）：日常、小工具、workflow、髒活、日人事向け等。 |
 | `full-stack-gab` | FG | Full-Stack Gab | 日英混排全端敘事：30 秒自我紹介、強項、FE／BE／狀態流、要件曖昧、取捨、運用、銜接 coding test、締語。 |
-| `david-pich` | DP | david-pich | 針對 David Pich 式面談：對手像、Loglass／Ruvia 敘事、demo 追問、輕誇句包、closing、同輩語感等。 |
+| `david-pich` | DP | david-pich | 針對 David Pich 式面談：對手像、Loglass／Ruvia 敘事、demo 追問、輕誇句包、closing、同輩語感等。**整場路由（題 id 對齊）**見 [`david-pich-routing.md`](./david-pich-routing.md)。 |
 | `booboo` | BB | 🧒booboo | 「合法小孩感」新卒／ジュニア向け：誠實、職種より課題、學習姿態、被問住、珍惜機會、收尾等大量短 variant。 |
 | `gyakukyujin` | GK | gyakukyujin | 逆質問與面談推進：期待值、缺口盤問、文化／mentor、follow-up 模擬、沈默控制、相親感短句等高密度腳本。 |
 | `ml-research-pack` | MR | ML / Research | 英語：研究→產品、團隊、日語溝通、ML 與產品、系統觀、評估、曖昧耐受、產品工程師方向等精簡 opener／段落。 |
@@ -27,7 +27,13 @@
 | `coding-test-loglass` | CL | coding-test-loglass | Loglass 向け coding test：前提整理・tradeoff・SaaS／業務文脈・チーム前提、見極めへの返し、短句工具（含實務接続一句）。 |
 | `coding-test-loglass-lite` | C2 | coding-test-loglass-lite | 同上主題の極短版（12 題）：面談前サッと掃る用。 |
 | `engineer-favor` | EF | Engineer Favor | 日語：強み主軸句、Spiral 設計說明、追問（トレードオフ／チーム）、**偏工程師好感**的實裝感、逆質問與承接、面談後半總括。 |
+| `hard-work` | HW | 💪hard-work | 努力を直接言わず「深くやった感」を出す日語テンプレ（`[xx]（例: …）` 差し替え）。**Cursor 向け `[xx]` 規約**は [`hard-work-placeholder-notes.md`](./hard-work-placeholder-notes.md)。 |
 | `loglass` | LG | Loglass | Loglass 專用：5 分 intro＋Spiral、技術深掘（event DAG、RWX、AI 分離）、志望、職種・標準化逆質問、Spiral 後接公司問等多 variant。 |
+| `loglass-internal-lexicon` | LI | loglass-internal-lexicon | Loglass 內部語彙包：定位句、動詞包、業務文脈詞、AI phrasing、Spiral 翻譯句、avoid 詞與 30 秒總結。 |
+| `loglass-talk-pack` | LT | loglass-talk-pack | Loglass 可直接說出口短答包：自己定位、Spiral 翻譯、要件/責務/AI、業務文脈、協働、志望、收尾等 15 題。 |
+| `loglass-simple-questions` | LS | loglass-simple-questions | Loglass 常見簡問包（20 題）：為何工程、為何 Spiral、志望、強弱項、史學背景、AI 使用、環境適配、一句收尾。 |
+| `loglass-frequent` | LF | loglass-frequent (15s) | Loglass 技術面／casual 高頻 10 題：**約 15 秒即答**日文一句版（短句・自然敬語）＋追問用短接続 3 句。 |
+| `ruvia-development-explain` | RV | ruvia-dev-explain | Ruvia 說明用：本質／動機、knot、與一般筆記差異、workflow、資料結構、spec-first、UI 分離、自造工具、與 Loglass 對齊（題名中文、本文日文）。**約 3 分 on-site demo 講＋做**見 [`ruvia-demo-routing.md`](./ruvia-demo-routing.md)。 |
 | `yt-ai-special` | YT | YT AI Special | 中日混排 AI／趨勢雜談：趨勢起手、現場感、指令品質、ドメイン、要件、顧客期待、雜談つなぎ、締め一文等。 |
 
 ---

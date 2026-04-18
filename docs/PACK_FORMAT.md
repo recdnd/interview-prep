@@ -132,3 +132,4 @@
 
 - 若內容是「多個可抽換的短句」，建議不要拆成多個 `variant`；改為放在**單一 variant** 內，並以 `- ` 條列排列。
 - 本文件主要描述「內容與資料語意」規範；UI 行為與互動細節以 `script.js` 為準。
+- **`[xx]（例: …）` プレースホルダ**を本文に埋め込む pack（例：`hard-work`）と、Cursor 向けの置換・記録規範は **[hard-work-placeholder-notes.md](./hard-work-placeholder-notes.md)** にまとめる（題庫ファイル外のメモとして保守する想定）。

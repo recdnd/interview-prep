@@ -1,0 +1,418 @@
+/* Pack Menu Kit: pack / question 列表面板、手機抽屜、列項目樣式（桌面與 mobile） */
+
+#pack-drawer-toggle {
+  display: none;
+}
+
+#question-drawer-toggle {
+  display: none;
+}
+
+#pack-mobile-drawer {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  #pack-panel {
+    display: none !important;
+  }
+
+  #question-panel {
+    display: none !important;
+  }
+
+  #pack-drawer-toggle {
+    display: block;
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 17px;
+    line-height: 1;
+    color: rgba(255, 105, 180, 0.92);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.88;
+    transition: opacity 0.15s ease;
+  }
+
+  #pack-drawer-toggle:hover {
+    opacity: 1;
+  }
+
+  #pack-drawer-toggle:active {
+    opacity: 0.72;
+  }
+
+  #pack-mobile-drawer.is-open {
+    display: block;
+    position: fixed;
+    right: 18px;
+    bottom: 42px;
+    width: 142px;
+    max-height: 5.75rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10000;
+    padding: 2px 3px;
+    border: 1px solid rgba(190, 130, 145, 0.28);
+    border-radius: 0;
+    background: rgba(255, 245, 248, 0.9);
+    box-shadow: 0 0 0 1px rgba(255, 210, 220, 0.12) inset;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  #pack-mobile-drawer.is-open::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #pack-mobile-drawer.is-open::-webkit-scrollbar-thumb {
+    background: rgba(200, 140, 155, 0.35);
+    border-radius: 0;
+  }
+
+  #pack-mobile-drawer .pack-item {
+    display: grid;
+    grid-template-columns: 13px 1fr;
+    align-items: start;
+    column-gap: 3px;
+    padding: 2px 1px;
+    margin: 0;
+    border-bottom: 1px solid rgba(220, 170, 180, 0.2);
+    color: rgba(48, 36, 40, 0.9);
+    font-size: 10px;
+    line-height: 1.25;
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  #pack-mobile-drawer .pack-item:last-child {
+    border-bottom: none;
+  }
+
+  #pack-mobile-drawer .pack-item:active {
+    background: rgba(255, 228, 234, 0.4);
+  }
+
+  #pack-mobile-drawer .pack-item.active {
+    background: rgba(255, 215, 225, 0.38);
+    color: rgba(12, 8, 10, 0.98);
+    box-shadow: inset 0 0 0 1px rgba(190, 110, 125, 0.28);
+    text-shadow: 0 0 8px rgba(255, 180, 195, 0.28);
+  }
+
+  #pack-mobile-drawer .pack-item-prefix {
+    display: inline-block;
+    font: inherit;
+    line-height: 1;
+    text-align: left;
+    color: inherit;
+  }
+
+  #pack-mobile-drawer .pack-item-name {
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* 題目抽屜：與粉色 pack 抽屜同座標；mint #03fcba 系 */
+  #question-drawer-toggle {
+    display: block;
+    position: fixed;
+    right: 56px;
+    bottom: 18px;
+    z-index: 9999;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 17px;
+    line-height: 1;
+    color: rgba(3, 252, 186, 0.88);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.9;
+    transition: opacity 0.15s ease;
+  }
+
+  #question-drawer-toggle:hover {
+    opacity: 1;
+  }
+
+  #question-drawer-toggle:active {
+    opacity: 0.72;
+  }
+
+  #question-mobile-drawer {
+    display: none;
+  }
+
+  #question-mobile-drawer.is-open {
+    display: block;
+    position: fixed;
+    right: 18px;
+    bottom: 42px;
+    width: 142px;
+    max-height: 25.875rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10000;
+    padding: 2px 3px;
+    border: 1px solid rgba(3, 200, 160, 0.28);
+    border-radius: 0;
+    background: rgba(235, 255, 248, 0.9);
+    box-shadow: 0 0 0 1px rgba(3, 252, 186, 0.12) inset;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  #question-mobile-drawer.is-open::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #question-mobile-drawer.is-open::-webkit-scrollbar-thumb {
+    background: rgba(3, 180, 150, 0.4);
+    border-radius: 0;
+  }
+
+  #question-mobile-drawer .question-item {
+    display: grid;
+    grid-template-columns: 13px 1fr;
+    align-items: start;
+    column-gap: 3px;
+    padding: 2px 1px;
+    margin: 0;
+    border-bottom: 1px solid rgba(3, 200, 160, 0.22);
+    color: rgba(20, 72, 58, 0.95);
+    font-size: 10px;
+    line-height: 1.25;
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  #question-mobile-drawer .question-item:last-child {
+    border-bottom: none;
+  }
+
+  #question-mobile-drawer .question-item:active {
+    background: rgba(3, 252, 186, 0.22);
+  }
+
+  #question-mobile-drawer .question-item.active {
+    background: rgba(3, 252, 186, 0.28);
+    color: rgba(8, 40, 32, 0.98);
+    box-shadow: inset 0 0 0 1px rgba(3, 200, 150, 0.45);
+    text-shadow: 0 0 8px rgba(3, 252, 186, 0.25);
+  }
+
+  #question-mobile-drawer .question-item-prefix {
+    display: inline-block;
+    font: inherit;
+    line-height: 1;
+    text-align: left;
+    color: inherit;
+  }
+
+  #question-mobile-drawer .question-item-name {
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+/* desktop：隱藏手機抽屜／切換鈕 + pack／question 列表面板 */
+@media (min-width: 1024px) {
+  #pack-mobile-drawer {
+    display: none !important;
+  }
+
+  #pack-drawer-toggle {
+    display: none !important;
+  }
+
+  #question-mobile-drawer {
+    display: none !important;
+  }
+
+  #question-drawer-toggle {
+    display: none !important;
+  }
+
+  #pack-panel {
+    position: fixed;
+    top: 42px;
+    right: var(--pack-panel-fixed-right);
+    width: var(--pack-panel-fixed-width);
+    max-height: 72vh;
+    overflow-y: auto;
+    z-index: 9998;
+    padding: 2px 3px;
+    border: 1px solid rgba(190, 130, 145, 0.28);
+    border-radius: 0;
+    background: rgba(255, 245, 248, 0.78);
+    box-shadow: 0 0 0 1px rgba(255, 210, 220, 0.12) inset;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  #pack-panel::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  #pack-panel::-webkit-scrollbar-thumb {
+    background: rgba(200, 140, 155, 0.35);
+    border-radius: 0;
+  }
+
+  #pack-panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .pack-item {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    align-items: start;
+    column-gap: 4px;
+    padding: 2px 1px;
+    margin: 0;
+    border-bottom: 1px solid rgba(220, 170, 180, 0.2);
+    color: rgba(48, 36, 40, 0.9);
+    font-size: 11px;
+    line-height: 1.25;
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .pack-item:last-child {
+    border-bottom: none;
+  }
+
+  .pack-item:hover {
+    background: rgba(255, 228, 234, 0.45);
+    color: rgba(24, 18, 22, 0.96);
+  }
+
+  .pack-item.active {
+    background: rgba(255, 215, 225, 0.42);
+    color: rgba(12, 8, 10, 0.98);
+    box-shadow: inset 0 0 0 1px rgba(190, 110, 125, 0.32);
+    text-shadow: 0 0 10px rgba(255, 180, 195, 0.35);
+  }
+
+  .pack-item-prefix {
+    display: inline-block;
+    font: inherit;
+    line-height: 1;
+    text-align: left;
+    color: inherit;
+  }
+
+  .pack-item-name {
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* 桌面題目列表面板：.wrap 左側中段、mint 薄層；高度最多為右側 pack panel max-height 的 4 倍 */
+  #question-panel {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    left: max(14px, calc((100vw - 36rem) / 2 - 198px));
+    width: 188px;
+    max-height: min(92vh, calc(72vh * 4));
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 9998;
+    padding: 2px 3px;
+    border: 1px solid rgba(3, 200, 160, 0.28);
+    border-radius: 0;
+    background: rgba(235, 255, 248, 0.78);
+    box-shadow: 0 0 0 1px rgba(3, 252, 186, 0.12) inset;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  #question-panel::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  #question-panel::-webkit-scrollbar-thumb {
+    background: rgba(3, 180, 150, 0.38);
+    border-radius: 0;
+  }
+
+  #question-panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .question-item {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    align-items: start;
+    column-gap: 4px;
+    padding: 2px 1px;
+    margin: 0;
+    border-bottom: 1px solid rgba(3, 200, 160, 0.2);
+    color: rgba(20, 72, 58, 0.92);
+    font-size: 11px;
+    line-height: 1.25;
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .question-item:last-child {
+    border-bottom: none;
+  }
+
+  .question-item:hover {
+    background: rgba(3, 252, 186, 0.2);
+    color: rgba(8, 48, 38, 0.96);
+  }
+
+  .question-item.active {
+    background: rgba(3, 252, 186, 0.3);
+    color: rgba(6, 36, 28, 0.98);
+    box-shadow: inset 0 0 0 1px rgba(3, 200, 150, 0.42);
+    text-shadow: 0 0 10px rgba(3, 252, 186, 0.28);
+  }
+
+  .question-item-prefix {
+    display: inline-block;
+    font: inherit;
+    line-height: 1;
+    text-align: left;
+    color: inherit;
+  }
+
+  .question-item-name {
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+}

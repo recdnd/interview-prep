@@ -822,20 +822,9 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     const listEl = document.getElementById('pack-panel-list');
     if (!listEl) return;
     listEl.innerHTML = '';
+    const rowFactory = window.PackMenuKit && window.PackMenuKit.createPackRow;
     PACK_ORDER.forEach(function (key) {
-      const row = document.createElement('div');
-      row.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
-      row.dataset.pack = key;
-
-      const prefix = document.createElement('span');
-      prefix.className = 'pack-item-prefix';
-      prefix.textContent = '\u27A2';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'pack-item-name';
-      nameEl.textContent = formatPackListLabel(key);
-
-      row.addEventListener('click', function () {
+      const onClick = function () {
         if (panelSelectedPack === key) {
           setPanelRowSelected(null);
           renderPackPanel();
@@ -846,10 +835,26 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
         if (key !== currentPack) {
           navigateToPack(key);
         }
-      });
-
-      row.appendChild(prefix);
-      row.appendChild(nameEl);
+      };
+      const row = rowFactory ? rowFactory({
+        active: panelSelectedPack === key,
+        label: formatPackListLabel(key),
+        onClick: onClick
+      }) : (function () {
+        const fallback = document.createElement('div');
+        fallback.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
+        const prefix = document.createElement('span');
+        prefix.className = 'pack-item-prefix';
+        prefix.textContent = '\u27A2';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'pack-item-name';
+        nameEl.textContent = formatPackListLabel(key);
+        fallback.appendChild(prefix);
+        fallback.appendChild(nameEl);
+        fallback.addEventListener('click', onClick);
+        return fallback;
+      })();
+      row.dataset.pack = key;
       listEl.appendChild(row);
     });
   }
@@ -892,21 +897,30 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     const listEl = document.getElementById('question-panel-list');
     if (!listEl) return;
     listEl.innerHTML = '';
+    const rowFactory = window.PackMenuKit && window.PackMenuKit.createQuestionRow;
     QUESTIONS.forEach(function (q, qIndex) {
-      const row = document.createElement('div');
-      row.className = 'question-item' + (state.activeQIndex === qIndex ? ' active' : '');
-      row.dataset.qIndex = String(qIndex);
-      const prefix = document.createElement('span');
-      prefix.className = 'question-item-prefix';
-      prefix.textContent = '\u27A2';
-      const nameEl = document.createElement('span');
-      nameEl.className = 'question-item-name';
-      nameEl.textContent = q.title || '';
-      row.addEventListener('click', function () {
+      const onClick = function () {
         jumpToQuestion(qIndex);
-      });
-      row.appendChild(prefix);
-      row.appendChild(nameEl);
+      };
+      const row = rowFactory ? rowFactory({
+        active: state.activeQIndex === qIndex,
+        label: q.title || '',
+        onClick: onClick
+      }) : (function () {
+        const fallback = document.createElement('div');
+        fallback.className = 'question-item' + (state.activeQIndex === qIndex ? ' active' : '');
+        const prefix = document.createElement('span');
+        prefix.className = 'question-item-prefix';
+        prefix.textContent = '\u27A2';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'question-item-name';
+        nameEl.textContent = q.title || '';
+        fallback.appendChild(prefix);
+        fallback.appendChild(nameEl);
+        fallback.addEventListener('click', onClick);
+        return fallback;
+      })();
+      row.dataset.qIndex = String(qIndex);
       listEl.appendChild(row);
     });
   }
@@ -915,22 +929,31 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     const listEl = document.getElementById('question-mobile-drawer-list');
     if (!listEl) return;
     listEl.innerHTML = '';
+    const rowFactory = window.PackMenuKit && window.PackMenuKit.createQuestionRow;
     QUESTIONS.forEach(function (q, qIndex) {
-      const row = document.createElement('div');
-      row.className = 'question-item' + (state.activeQIndex === qIndex ? ' active' : '');
-      row.dataset.qIndex = String(qIndex);
-      const prefix = document.createElement('span');
-      prefix.className = 'question-item-prefix';
-      prefix.textContent = '\u27A2';
-      const nameEl = document.createElement('span');
-      nameEl.className = 'question-item-name';
-      nameEl.textContent = q.title || '';
-      row.addEventListener('click', function () {
+      const onClick = function () {
         closeAllMobileDrawers();
         jumpToQuestion(qIndex);
-      });
-      row.appendChild(prefix);
-      row.appendChild(nameEl);
+      };
+      const row = rowFactory ? rowFactory({
+        active: state.activeQIndex === qIndex,
+        label: q.title || '',
+        onClick: onClick
+      }) : (function () {
+        const fallback = document.createElement('div');
+        fallback.className = 'question-item' + (state.activeQIndex === qIndex ? ' active' : '');
+        const prefix = document.createElement('span');
+        prefix.className = 'question-item-prefix';
+        prefix.textContent = '\u27A2';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'question-item-name';
+        nameEl.textContent = q.title || '';
+        fallback.appendChild(prefix);
+        fallback.appendChild(nameEl);
+        fallback.addEventListener('click', onClick);
+        return fallback;
+      })();
+      row.dataset.qIndex = String(qIndex);
       listEl.appendChild(row);
     });
   }
@@ -939,20 +962,9 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
     const listEl = document.getElementById('pack-mobile-drawer-list');
     if (!listEl) return;
     listEl.innerHTML = '';
+    const rowFactory = window.PackMenuKit && window.PackMenuKit.createPackRow;
     PACK_ORDER.forEach(function (key) {
-      const row = document.createElement('div');
-      row.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
-      row.dataset.pack = key;
-
-      const prefix = document.createElement('span');
-      prefix.className = 'pack-item-prefix';
-      prefix.textContent = '\u27A2';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'pack-item-name';
-      nameEl.textContent = formatPackListLabel(key);
-
-      row.addEventListener('click', function () {
+      const onClick = function () {
         if (panelSelectedPack === key) {
           setPanelRowSelected(null);
           renderPackPanel();
@@ -969,10 +981,26 @@ function initApp(PACK, currentPack, PACK_ORDER, PACK_LABEL) {
           return;
         }
         if (isMobileViewport()) closeAllMobileDrawers();
-      });
-
-      row.appendChild(prefix);
-      row.appendChild(nameEl);
+      };
+      const row = rowFactory ? rowFactory({
+        active: panelSelectedPack === key,
+        label: formatPackListLabel(key),
+        onClick: onClick
+      }) : (function () {
+        const fallback = document.createElement('div');
+        fallback.className = 'pack-item' + (panelSelectedPack === key ? ' active' : '');
+        const prefix = document.createElement('span');
+        prefix.className = 'pack-item-prefix';
+        prefix.textContent = '\u27A2';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'pack-item-name';
+        nameEl.textContent = formatPackListLabel(key);
+        fallback.appendChild(prefix);
+        fallback.appendChild(nameEl);
+        fallback.addEventListener('click', onClick);
+        return fallback;
+      })();
+      row.dataset.pack = key;
       listEl.appendChild(row);
     });
   }
